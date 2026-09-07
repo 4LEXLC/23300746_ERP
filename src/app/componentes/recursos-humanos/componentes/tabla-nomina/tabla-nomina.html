@@ -1,0 +1,52 @@
+<section class="card payroll-card">
+  <header class="card-head">
+    <hgroup>
+      <h3>Pagos de nómina</h3>
+      <p class="csub">Quincena en curso</p>
+    </hgroup>
+    <button
+      type="button"
+      class="pay-btn"
+      (click)="registrarPago.emit()"
+      [disabled]="!trabajadoresConPagoPendiente.length"
+    >
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5s-5 1.4-5 3.2c0 4 10 1.8 10 5.8 0 1.8-2.2 3.5-5 3.5s-5-1.6-5-3.5"/></svg></span>
+      Registrar pago de salario
+    </button>
+  </header>
+  <section class="table-scroll" aria-label="Pagos de nómina" tabindex="0">
+    <table class="payroll-table">
+      <thead>
+        <tr>
+          <th>Trabajador</th>
+          <th>Puesto</th>
+          <th>Periodo</th>
+          <th>Monto</th>
+          <th>Fecha de pago</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pago of pagos; track pago.trabajador) {
+          <tr>
+            <td>
+              <span class="who">
+                <span class="who-av">{{ iniciales(pago.trabajador) }}</span>
+                <p class="who-name">{{ pago.trabajador }}</p>
+              </span>
+            </td>
+            <td>{{ pago.puesto }}</td>
+            <td>{{ pago.periodo }}</td>
+            <td class="price">${{ pago.monto.toFixed(2) }}</td>
+            <td>{{ pago.fechaPago }}</td>
+            <td>
+              <span class="badge" [class]="pago.estado">
+                <span class="dotb"></span>{{ pago.estado === 'pagado' ? 'Pagado' : 'Pendiente' }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</section>

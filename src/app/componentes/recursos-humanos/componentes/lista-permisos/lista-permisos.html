@@ -1,0 +1,37 @@
+<section class="card">
+  <header class="card-head">
+    <h3>Permisos y vacaciones</h3>
+    <button type="button" class="mini-add" (click)="nuevaSolicitud.emit()">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      Nueva solicitud
+    </button>
+  </header>
+  <p class="csub">Solicitudes recientes</p>
+  <ul class="perm-list">
+    @for (permiso of permisos; track permiso.nombre + $index) {
+      <li class="perm-row">
+        <span class="perm-top">
+          <span class="perm-name">{{ permiso.nombre }}</span>
+          <span class="badge" [class]="permiso.estado">
+            <span class="dotb"></span>
+            @switch (permiso.estado) {
+              @case ('pendiente') { Pendiente }
+              @case ('aprobado') { Aprobado }
+              @case ('rechazado') { Rechazado }
+            }
+          </span>
+        </span>
+        <p class="perm-type">{{ permiso.tipo }}</p>
+        <p class="perm-dates">{{ permiso.fechas }}</p>
+        @if (permiso.estado === 'pendiente') {
+          <span class="perm-actions">
+            <button type="button" class="perm-approve" (click)="aprobar.emit(permiso)">Aprobar</button>
+            <button type="button" class="perm-reject" (click)="rechazar.emit(permiso)">Rechazar</button>
+          </span>
+        }
+      </li>
+    } @empty {
+      <li class="empty-row">Sin solicitudes registradas.</li>
+    }
+  </ul>
+</section>

@@ -1,0 +1,58 @@
+<header class="page-head">
+  <hgroup>
+    <h1>Recursos Humanos</h1>
+    <p>{{ activos }} trabajadores activos · {{ bajas }} baja(s) · {{ permisosPendientes }} permiso(s) pendiente(s)</p>
+  </hgroup>
+  <button type="button" class="add-btn" (click)="abrirNuevoTrabajador()">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+    Agregar trabajador
+  </button>
+</header>
+
+@if (mostrarFormularioTrabajador) {
+  <app-formulario-trabajador
+    [trabajadorEditar]="trabajadorEnEdicion"
+    (cerrar)="mostrarFormularioTrabajador = false"
+    (guardar)="guardarTrabajador($event)"
+  />
+}
+@if (mostrarFormularioPermiso) {
+  <app-formulario-permiso
+    [listaTrabajadores]="nombresTrabajadores"
+    (cerrar)="mostrarFormularioPermiso = false"
+    (guardar)="agregarPermiso($event)"
+  />
+}
+@if (mostrarFormularioPagoSalario) {
+  <app-formulario-pago-salario
+    [trabajadores]="trabajadoresConPagoPendiente"
+    (cerrar)="mostrarFormularioPagoSalario = false"
+    (guardar)="registrarPagoSalario($event)"
+  />
+}
+
+<section class="layout">
+  <app-tabla-trabajadores
+    [trabajadores]="trabajadores"
+    (cambiarEstado)="cambiarEstadoTrabajador($event)"
+    (editar)="editarTrabajador($event)"
+    (registrarAsistencia)="registrarAsistencia($event)"
+  />
+
+  <section>
+    <app-lista-asistencias [asistencias]="asistencias" />
+
+    <app-lista-permisos
+      [permisos]="permisos"
+      (nuevaSolicitud)="mostrarFormularioPermiso = true"
+      (aprobar)="aprobarPermiso($event)"
+      (rechazar)="rechazarPermiso($event)"
+    />
+  </section>
+</section>
+
+<app-tabla-nomina
+  [pagos]="pagos"
+  [trabajadoresConPagoPendiente]="trabajadoresConPagoPendiente"
+  (registrarPago)="mostrarFormularioPagoSalario = true"
+/>

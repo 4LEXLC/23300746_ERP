@@ -1,0 +1,82 @@
+.pcard {
+  position: relative;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+}
+
+.pimg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88px;
+  margin: 0;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+}
+
+.pimg .icon {
+  width: 30px;
+  height: 30px;
+}
+
+.padd {
+  position: absolute;
+  top: 80px;
+  right: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(92, 61, 36, 0.35);
+  cursor: pointer;
+}
+
+.padd .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.pqty {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.pname {
+  margin-top: 12px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.pcat {
+  margin-top: 1px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.pprice {
+  margin-top: 8px;
+  color: var(--accent);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}

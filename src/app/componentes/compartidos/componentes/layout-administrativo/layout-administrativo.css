@@ -1,0 +1,73 @@
+* {
+  box-sizing: border-box;
+}
+:host {
+  --bg: #f9f7f4;
+  --surface: #ffffff;
+  --surface-alt: #f3efe9;
+  --border: #e7e1d8;
+  --border-soft: #efeae2;
+  --text-primary: #241c14;
+  --text-secondary: #6b5f52;
+  --text-muted: #948a7c;
+  --accent: #5c3d24;
+  --accent-hover: #4a3019;
+  --accent-soft: #eee2d3;
+  --accent-2: #c98a3f;
+  --good: #0ca30c;
+  --good-soft: #e3f5e3;
+  --warning: #b8790a;
+  --warning-soft: #fbedd3;
+  --critical: #d03b3b;
+  --critical-soft: #fbe6e6;
+  width: 100%;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'sidebar topbar'
+    'sidebar content';
+  background: var(--bg);
+  font-family: 'Manrope', system-ui, sans-serif;
+  color: var(--text-primary);
+  overflow: hidden;
+}
+app-sidebar {
+  grid-area: sidebar;
+}
+app-topbar {
+  grid-area: topbar;
+}
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+h1,
+h2,
+h3 {
+  font-family: 'Sora', system-ui, sans-serif;
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.content {
+  grid-area: content;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 26px 32px;
+}

@@ -1,0 +1,101 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Nueva orden de compra</h3>
+        <p>Selecciona un proveedor y agrega los productos a solicitar</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field-row">
+        <section class="field">
+          <label for="oc-prov">Proveedor <span class="req">*</span></label>
+          <select id="oc-prov" class="box" name="proveedor" [(ngModel)]="proveedorSeleccionado" required>
+            <option value="" disabled>Selecciona un proveedor</option>
+            @for (proveedor of proveedores; track proveedor) {
+              <option [value]="proveedor">{{ proveedor }}</option>
+            }
+          </select>
+        </section>
+        <section class="field">
+          <label for="oc-fecha">Fecha de la orden <span class="req">*</span></label>
+          <input id="oc-fecha" class="box" type="date" name="fecha" [(ngModel)]="fecha" required />
+        </section>
+      </section>
+
+      <header class="items-head">
+        <label>Productos a solicitar <span class="req">*</span></label>
+        <p class="csub">El proveedor entrega el producto ya preparado; se suma directo al inventario al recibirlo.</p>
+      </header>
+      <section class="add-panel">
+        <section class="field add-field">
+          <label for="oc-nuevo-nombre">Producto</label>
+          <select
+            id="oc-nuevo-nombre"
+            class="box"
+            name="productoSeleccionado"
+            [ngModel]="productoSeleccionado"
+            (ngModelChange)="seleccionarProducto($event)"
+            [ngModelOptions]="{ standalone: true }"
+          >
+            <option value="" disabled>Selecciona un producto</option>
+            @for (producto of productosDisponibles; track producto.sku) {
+              <option [value]="producto.nombre">{{ producto.nombre }}</option>
+            }
+          </select>
+        </section>
+        <section class="add-row">
+          <section class="field add-field">
+            <label for="oc-nueva-cantidad">Cantidad</label>
+            <input id="oc-nueva-cantidad" class="box" type="number" min="1" name="nuevaCantidad" [(ngModel)]="nuevaCantidad" [ngModelOptions]="{ standalone: true }" />
+          </section>
+          <section class="field add-field">
+            <label for="oc-nuevo-precio">Precio de compra</label>
+            <input id="oc-nuevo-precio" class="box" type="number" min="0" step="0.01" name="nuevoPrecio" [(ngModel)]="nuevoPrecio" [ngModelOptions]="{ standalone: true }" />
+          </section>
+          <button type="button" class="mini-add" (click)="agregarItem()">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            Agregar
+          </button>
+        </section>
+      </section>
+
+      <ul class="items-list">
+        @for (item of items; track item.nombre + $index) {
+          <li class="oc-item">
+            <span class="oc-img"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg></span></span>
+            <hgroup class="oc-info">
+              <p class="oc-name">{{ item.nombre }}</p>
+              <p class="oc-qty">Cantidad: {{ item.cantidad }} · Precio de compra: ${{ item.precioUnitario.toFixed(2) }}</p>
+            </hgroup>
+            <span class="oc-amt">${{ (item.cantidad * item.precioUnitario).toFixed(2) }}</span>
+            <button type="button" class="oc-rm" aria-label="Quitar producto" (click)="quitarItem($index)">
+              <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+            </button>
+          </li>
+        } @empty {
+          <li class="items-empty">Aún no has agregado productos a la orden.</li>
+        }
+      </ul>
+
+      <section class="field">
+        <label>Estado de la orden</label>
+        <span class="box static">Pendiente</span>
+      </section>
+
+      <p class="oc-total"><span class="l">Total de la orden</span><span class="v">${{ total.toFixed(2) }}</span></p>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Registrar orden de compra
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

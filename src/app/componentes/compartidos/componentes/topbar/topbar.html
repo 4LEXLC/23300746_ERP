@@ -1,0 +1,16 @@
+<header class="topbar">
+  <search class="search">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <input placeholder="Buscar en el sistema..." />
+  </search>
+  <span class="user-chip">
+    <span class="avatar">{{ authService.nombreMostrado.slice(0, 2).toUpperCase() }}</span>
+    <hgroup>
+      <p class="user-name">{{ authService.nombreMostrado }}</p>
+      <p class="user-role">{{ authService.rolMostrado }}</p>
+    </hgroup>
+    <button type="button" class="icon-btn" (click)="cerrarSesion()" aria-label="Cerrar sesión">
+      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+    </button>
+  </span>
+</header>

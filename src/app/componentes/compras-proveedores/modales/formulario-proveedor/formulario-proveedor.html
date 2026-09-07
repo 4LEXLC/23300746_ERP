@@ -1,0 +1,42 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Agregar proveedor</h3>
+        <p>Registra un nuevo proveedor para tus compras</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="pr-nombre">Nombre del proveedor <span class="req">*</span></label>
+        <input id="pr-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Proveedor nuevo" required />
+      </section>
+      <section class="field-row">
+        <section class="field">
+          <label for="pr-tel">Teléfono <span class="req">*</span></label>
+          <input id="pr-tel" class="box" type="tel" name="telefono" [(ngModel)]="datos.telefono" placeholder="33 0000 0000" />
+        </section>
+        <section class="field">
+          <label for="pr-correo">Correo electrónico</label>
+          <input id="pr-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" placeholder="contacto@proveedor.mx" />
+        </section>
+      </section>
+      <section class="field">
+        <label for="pr-notas">Dirección / datos de contacto</label>
+        <textarea id="pr-notas" class="box" name="notas" [(ngModel)]="datos.notas" placeholder="Dirección, contacto principal, notas adicionales"></textarea>
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Guardar proveedor
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

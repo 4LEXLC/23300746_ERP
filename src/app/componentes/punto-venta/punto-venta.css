@@ -1,0 +1,369 @@
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  --bg: #f9f7f4;
+  --surface: #ffffff;
+  --surface-alt: #f3efe9;
+  --border: #e7e1d8;
+  --border-soft: #efeae2;
+  --text-primary: #241c14;
+  --text-secondary: #6b5f52;
+  --text-muted: #948a7c;
+  --accent: #5c3d24;
+  --accent-hover: #4a3019;
+  --accent-soft: #eee2d3;
+  --accent-2: #c98a3f;
+  --good: #0ca30c;
+  --good-soft: #e3f5e3;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  grid-template-rows: 68px 1fr;
+  grid-template-areas:
+    'topbar topbar'
+    'main aside';
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+:host:has(app-sidebar) {
+  grid-template-columns: auto 1fr 380px;
+  grid-template-areas:
+    'sidebar topbar topbar'
+    'sidebar main aside';
+}
+app-sidebar {
+  grid-area: sidebar;
+}
+
+.icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: 'Sora', system-ui, sans-serif;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+dl,
+dt,
+dd {
+  margin: 0;
+  font-weight: inherit;
+}
+
+/* Topbar */
+
+.topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  padding: 0 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.brand hgroup,
+.user-chip hgroup {
+  margin: 0;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 9px;
+}
+
+.brand-mark .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.brand-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.brand-tag {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--surface-alt);
+  color: var(--text-secondary);
+  border-radius: 10px;
+}
+
+.icon-btn .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 50%;
+  font-family: 'Sora', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.user-role {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Layout */
+
+.main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 22px 24px;
+}
+
+/* Search */
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+}
+
+.search .icon {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+}
+
+.search input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13.5px;
+}
+
+/* Category tabs */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Product grid */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+  padding-bottom: 8px;
+  overflow-y: auto;
+}
+
+/* Cart */
+
+.cart {
+  grid-area: aside;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border-soft);
+}
+
+.cart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.cart-head h3 {
+  font-size: 16px;
+}
+
+.cart-count {
+  padding: 3px 9px;
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.cart-items {
+  flex: 1;
+  margin: 0;
+  padding: 10px 22px;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.cart-empty {
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.cart-summary {
+  padding: 18px 22px 22px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  row-gap: 8px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.totals dd {
+  text-align: right;
+}
+
+.totals dt.total,
+.totals dd.total {
+  margin-top: 6px;
+  color: var(--text-primary);
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.factura-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.cart-error {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--critical-soft);
+  color: var(--critical);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.checkout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 11px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.checkout-btn:disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.checkout-btn .icon {
+  width: 16px;
+  height: 16px;
+}

@@ -1,0 +1,55 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Registrar pago de salario</h3>
+        <p>Selecciona al trabajador que va a recibir el pago</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="ps-trabajador">Trabajador <span class="req">*</span></label>
+        <select id="ps-trabajador" class="box" name="trabajador" [(ngModel)]="datos.trabajador" required>
+          @for (trabajador of trabajadores; track trabajador) {
+            <option [value]="trabajador">{{ trabajador }}</option>
+          }
+        </select>
+        <p class="hint">Solo se listan trabajadores con pago pendiente</p>
+      </section>
+
+      <section class="field-row">
+        <section class="field">
+          <label for="ps-inicio">Periodo — inicio <span class="req">*</span></label>
+          <input id="ps-inicio" class="box" type="date" name="periodoInicio" [(ngModel)]="datos.periodoInicio" required />
+        </section>
+        <section class="field">
+          <label for="ps-fin">Periodo — fin <span class="req">*</span></label>
+          <input id="ps-fin" class="box" type="date" name="periodoFin" [(ngModel)]="datos.periodoFin" required />
+        </section>
+      </section>
+
+      <section class="field-row">
+        <section class="field">
+          <label for="ps-monto">Monto a pagar <span class="req">*</span></label>
+          <input id="ps-monto" class="box" type="number" min="0" step="0.01" name="monto" [(ngModel)]="datos.monto" required />
+        </section>
+        <section class="field">
+          <label for="ps-fecha">Fecha de pago <span class="req">*</span></label>
+          <input id="ps-fecha" class="box" type="date" name="fechaPago" [(ngModel)]="datos.fechaPago" required />
+        </section>
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Registrar pago
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

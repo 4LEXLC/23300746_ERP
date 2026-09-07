@@ -1,0 +1,26 @@
+<section class="card">
+  <h3>Asistencias de hoy</h3>
+  <p class="csub">Registro del día</p>
+  <ul class="att-list">
+    @for (asistencia of asistencias; track asistencia.nombre) {
+      <li class="att-row">
+        <span class="att-av">{{ iniciales(asistencia.nombre) }}</span>
+        <hgroup class="att-info">
+          <p class="att-name">{{ asistencia.nombre }}</p>
+          <p class="att-time">{{ asistencia.detalle }}</p>
+        </hgroup>
+        <span class="badge" [class]="asistencia.estado">
+          <span class="dotb"></span>
+          @switch (asistencia.estado) {
+            @case ('a-tiempo') { A tiempo }
+            @case ('retardo') { Retardo }
+            @case ('falta') { Falta }
+            @case ('extra') { Extra }
+          }
+        </span>
+      </li>
+    } @empty {
+      <li class="empty-row">Sin registros de asistencia todavía.</li>
+    }
+  </ul>
+</section>

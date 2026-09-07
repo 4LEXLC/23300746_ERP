@@ -1,0 +1,142 @@
+      <header class="page-head">
+        <hgroup>
+          <h1>Inventario</h1>
+          <p>{{ totalProductos }} productos registrados · {{ productosConAlerta }} con alerta de existencia</p>
+        </hgroup>
+        <button type="button" class="add-btn" (click)="abrirNuevoProducto()">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          Agregar producto
+        </button>
+      </header>
+
+      @if (mostrarFormularioProducto) {
+        <app-formulario-producto
+          [productoEditar]="productoEnEdicion"
+          (cerrar)="mostrarFormularioProducto = false"
+          (guardar)="guardarProducto($event)"
+        />
+      }
+
+      <search class="filters">
+        <span class="f-search">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input placeholder="Buscar producto..." [(ngModel)]="busqueda" name="busqueda" />
+        </span>
+        <select class="f-select" [(ngModel)]="categoriaFiltro" name="categoriaFiltro">
+          <option value="">Todas las categorías</option>
+          @for (categoria of categorias; track categoria) {
+            <option [value]="categoria">{{ categoria }}</option>
+          }
+        </select>
+        <select class="f-select" [(ngModel)]="estadoFiltro" name="estadoFiltro">
+          <option value="">Todos los estados</option>
+          <option value="disponible">Disponible</option>
+          <option value="alerta">Alerta</option>
+          <option value="agotado">Agotado</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </search>
+
+      <section class="table-scroll" aria-label="Productos del inventario" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Existencia</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (producto of productosFiltrados; track producto.sku) {
+              <tr>
+                <td>
+                  <span class="prod-cell">
+                    <span class="p-img"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span></span>
+                    <p class="p-name">{{ producto.nombre }}</p>
+                    <p class="muted">{{ producto.sku }}</p>
+                  </span>
+                </td>
+                <td>{{ producto.categoria }}</td>
+                <td class="price">${{ producto.precio.toFixed(2) }}</td>
+                <td>
+                  <span class="exist">
+                    <b>{{ producto.existencia }}</b>
+                    <span class="muted">/ mín. {{ producto.minimo }}</span>
+                    <span class="bar"><i [style.width.%]="porcentajeExistencia(producto)" [class]="estado(producto)"></i></span>
+                  </span>
+                </td>
+                <td>
+                  @if (producto.estado === 'inactivo') {
+                    <span class="badge inactivo"><span class="dotb"></span>Inactivo</span>
+                  } @else {
+                    <span class="badge" [class]="estado(producto)">
+                      <span class="dotb"></span>
+                      @switch (estado(producto)) {
+                        @case ('disponible') { Disponible }
+                        @case ('alerta') { Alerta }
+                        @case ('agotado') { Agotado }
+                      }
+                    </span>
+                  }
+                </td>
+                <td>
+                  <span class="actions-cell">
+                    <button type="button" class="act" aria-label="Editar {{ producto.nombre }}" (click)="editarProducto(producto)">
+                      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>
+                    </button>
+                    <button
+                      type="button"
+                      class="act"
+                      [attr.aria-label]="(producto.estado === 'activo' ? 'Desactivar ' : 'Activar ') + producto.nombre"
+                      (click)="alternarEstadoProducto(producto)"
+                    >
+                      <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></span>
+                    </button>
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      <header class="sec-head">
+        <h2>Movimientos de inventario recientes</h2>
+        <p>Entradas registradas por compras recibidas y salidas por ventas o mermas</p>
+      </header>
+      <section class="table-scroll" aria-label="Movimientos de inventario" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Motivo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (mov of movimientos; track mov.producto + $index) {
+              <tr>
+                <td><span class="p-name">{{ mov.producto }}</span></td>
+                <td>
+                  <span class="badge" [class]="mov.tipo">
+                    <span class="dotb"></span>
+                    @switch (mov.tipo) {
+                      @case ('entrada') { Entrada }
+                      @case ('salida') { Salida }
+                      @case ('merma') { Merma }
+                    }
+                  </span>
+                </td>
+                <td class="price">{{ mov.tipo === 'entrada' ? '+' : '-' }}{{ mov.cantidad }}</td>
+                <td class="muted">{{ mov.motivo }}</td>
+                <td>{{ mov.fecha | date: 'dd/MM/yyyy' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>

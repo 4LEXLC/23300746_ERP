@@ -1,0 +1,51 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Registrar cliente para facturación</h3>
+        <p>Captura los datos fiscales para emitir la factura</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="c-nombre">Nombre o razón social <span class="req">*</span></label>
+        <input id="c-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Distribuidora García S.A. de C.V." required />
+      </section>
+      <section class="field-row">
+        <section class="field">
+          <label for="c-rfc">RFC <span class="req">*</span></label>
+          <input id="c-rfc" class="box" type="text" name="rfc" [(ngModel)]="datos.rfc" placeholder="XAXX010101000" required />
+        </section>
+        <section class="field">
+          <label for="c-cp">Código postal <span class="req">*</span></label>
+          <input id="c-cp" class="box" type="text" name="codigoPostal" [(ngModel)]="datos.codigoPostal" placeholder="00000" required />
+        </section>
+      </section>
+      <section class="field">
+        <label for="c-regimen">Régimen fiscal <span class="req">*</span></label>
+        <select id="c-regimen" class="box" name="regimenFiscal" [(ngModel)]="datos.regimenFiscal" required>
+          <option value="" disabled>Selecciona un régimen</option>
+          @for (regimen of regimenes; track regimen) {
+            <option [value]="regimen">{{ regimen }}</option>
+          }
+        </select>
+      </section>
+      <section class="field">
+        <label for="c-correo">Correo electrónico</label>
+        <input id="c-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" placeholder="correo@cliente.mx" />
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Guardar cliente
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

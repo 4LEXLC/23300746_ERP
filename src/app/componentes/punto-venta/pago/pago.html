@@ -1,0 +1,81 @@
+<header class="topbar">
+  <button type="button" class="back" (click)="volverAlPedido()">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></span>
+    Volver al pedido
+  </button>
+  <ol class="steps">
+    <li class="step done">
+      <span class="step-dot"><span class="icon" style="width: 12px; height: 12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+      Pedido
+    </li>
+    <li class="step-line"></li>
+    <li class="step active"><span class="step-dot">2</span>Pago</li>
+    <li class="step-line"></li>
+    <li class="step"><span class="step-dot">3</span>Ticket</li>
+  </ol>
+  <span class="spacer"></span>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h3>Resumen del pedido</h3>
+    <ul class="sum-list">
+      @for (item of carritoService.items; track item.producto.nombre) {
+        <li class="sum-item">
+          <span>{{ item.producto.nombre }} × {{ item.cantidad }}</span>
+          <b>${{ (item.producto.precio * item.cantidad).toFixed(2) }}</b>
+        </li>
+      } @empty {
+        <li class="sum-item" style="border-bottom: none">Sin productos en el pedido.</li>
+      }
+    </ul>
+    <p class="sum-tot"><span>Subtotal</span><span>${{ carritoService.subtotal.toFixed(2) }}</span></p>
+    <p class="sum-tot"><span>IVA (16%)</span><span>${{ carritoService.iva.toFixed(2) }}</span></p>
+    <p class="sum-tot"><span>Total</span><span>${{ carritoService.total.toFixed(2) }}</span></p>
+    <p class="folio"><span>¿Solicita factura?</span><b>{{ carritoService.solicitaFactura ? 'Sí' : 'No' }}</b></p>
+  </section>
+
+  <section class="payment-col">
+    <section class="card">
+      <h3>Selecciona método de pago</h3>
+      <section class="methods">
+        @for (metodo of metodos; track metodo.id) {
+          <button
+            type="button"
+            class="method"
+            [class.sel]="metodo.id === carritoService.metodoPago"
+            [attr.aria-pressed]="metodo.id === carritoService.metodoPago"
+            (click)="seleccionarMetodo(metodo.id)"
+          >
+            @if (metodo.id === carritoService.metodoPago) {
+              <span class="check-badge"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></span>
+            }
+            <span class="m-icon">
+              @switch (metodo.id) {
+                @case ('efectivo') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></span>
+                }
+                @case ('tarjeta') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+                }
+              }
+            </span>
+            <span class="m-label">{{ metodo.etiqueta }}</span>
+          </button>
+        }
+      </section>
+    </section>
+
+    <section class="status-card">
+      @if (procesandoPago) {
+        <p class="gateway-status">Conectando con la pasarela de pago…</p>
+      }
+      <button
+        type="button"
+        class="status-cta"
+        [disabled]="!carritoService.items.length || procesandoPago"
+        (click)="procesarPago()"
+      >{{ procesandoPago ? 'Procesando…' : 'Procesar pago' }}</button>
+    </section>
+  </section>
+</main>

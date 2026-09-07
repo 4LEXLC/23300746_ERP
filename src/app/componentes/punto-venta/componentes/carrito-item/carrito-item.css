@@ -1,0 +1,90 @@
+.citem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-soft);
+  list-style: none;
+}
+
+.cimg {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin: 0;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 9px;
+}
+
+.cimg .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.cinfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cname {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cunit {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.cright {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ctotal {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px;
+  background: var(--surface-alt);
+  border-radius: 20px;
+}
+
+.step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.step-btn .icon {
+  width: 11px;
+  height: 11px;
+}
+
+.step-val {
+  width: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}

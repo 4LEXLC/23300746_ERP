@@ -1,0 +1,53 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Registrar permiso o vacaciones</h3>
+        <p>Nueva solicitud para un trabajador</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="pm-trabajador">Trabajador <span class="req">*</span></label>
+        <select id="pm-trabajador" class="box" name="trabajador" [(ngModel)]="datos.trabajador">
+          @for (trabajador of trabajadores; track trabajador) {
+            <option [value]="trabajador">{{ trabajador }}</option>
+          }
+        </select>
+      </section>
+      <section class="field">
+        <label>Tipo de solicitud <span class="req">*</span></label>
+        <span class="toggle">
+          <button type="button" class="toggle-opt" [class.active]="datos.tipo === 'Permiso'" (click)="seleccionarTipo('Permiso')">Permiso</button>
+          <button type="button" class="toggle-opt" [class.active]="datos.tipo === 'Vacaciones'" (click)="seleccionarTipo('Vacaciones')">Vacaciones</button>
+        </span>
+      </section>
+      <section class="field-row">
+        <section class="field">
+          <label for="pm-inicio">Fecha inicio <span class="req">*</span></label>
+          <input id="pm-inicio" class="box" type="date" name="fechaInicio" [(ngModel)]="datos.fechaInicio" required />
+        </section>
+        <section class="field">
+          <label for="pm-fin">Fecha fin <span class="req">*</span></label>
+          <input id="pm-fin" class="box" type="date" name="fechaFin" [(ngModel)]="datos.fechaFin" required />
+        </section>
+      </section>
+      <section class="field">
+        <label for="pm-motivo">Motivo</label>
+        <textarea id="pm-motivo" class="box" name="motivo" [(ngModel)]="datos.motivo" placeholder="Motivo de la solicitud (opcional)"></textarea>
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Enviar solicitud
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

@@ -1,0 +1,98 @@
+      <header class="page-head">
+        <hgroup>
+          <h1>Contabilidad y Finanzas</h1>
+          <p>Resumen financiero del periodo seleccionado</p>
+        </hgroup>
+        <section class="head-right">
+          <nav class="periods">
+            @for (periodo of periodos; track periodo) {
+              <button type="button" class="period" [class.active]="periodo === periodoActivo" (click)="periodoActivo = periodo">{{ periodo }}</button>
+            }
+          </nav>
+          <button type="button" class="export-btn" (click)="generarReporte()">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>
+            Generar reporte
+          </button>
+          <button type="button" class="export-btn" (click)="exportarExcel()">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+            Exportar a Excel
+          </button>
+        </section>
+      </header>
+
+      <ul class="kpis">
+        @for (kpi of kpis; track kpi.etiqueta) {
+          <li class="kpi">
+            <span class="kpi-label">{{ kpi.etiqueta }}</span>
+            <p class="kpi-val tabular">${{ kpi.valor.toFixed(2) }}</p>
+          </li>
+        }
+      </ul>
+
+      <section class="charts-row">
+        <section class="chart-card">
+          <h3>Ingresos vs. egresos</h3>
+          <p class="csub">Últimos 6 meses</p>
+          <ul class="legend">
+            <li class="leg-item"><span class="leg-dot" style="background: #2a78d6"></span>Ingresos</li>
+            <li class="leg-item"><span class="leg-dot" style="background: #eb6834"></span>Egresos</li>
+          </ul>
+          <ul class="bars">
+            @for (item of resumenMensual; track item.mes) {
+              <li class="bgroup">
+                <span class="bar" [style.height.%]="(item.ingresos / maxMensual) * 100" style="background: #2a78d6"></span>
+                <span class="bar" [style.height.%]="(item.egresos / maxMensual) * 100" style="background: #eb6834"></span>
+              </li>
+            }
+          </ul>
+          <ul class="blabels">
+            @for (item of resumenMensual; track item.mes) {
+              <li class="blabel">{{ item.mes }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="chart-card">
+          <h3>Distribución de egresos</h3>
+          <p class="csub">Por categoría del periodo</p>
+          <figure class="donut-wrap">
+            <span class="donut" [style.background]="donutGradient">
+              <span class="donut-center"><span class="dc-label">Total</span><span class="dc-val tabular">${{ egresosTotal.toFixed(0) }}</span></span>
+            </span>
+          </figure>
+          <ul class="donut-legend">
+            @for (categoria of egresos; track categoria.nombre) {
+              <li class="dl-row">
+                <span class="leg-dot" [style.background]="categoria.color"></span>
+                <span class="dl-name">{{ categoria.nombre }}</span>
+                <span class="dl-pct">{{ categoria.porcentaje }}%</span>
+                <span class="dl-amt tabular">${{ categoria.monto }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      </section>
+
+      <section class="table-scroll" aria-label="Movimientos contables" tabindex="0">
+        <table class="table-card">
+          <thead>
+            <tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Monto</th></tr>
+          </thead>
+          <tbody>
+            @for (mov of movimientos; track mov.concepto + $index) {
+              <tr>
+                <td class="c-fecha">{{ mov.fecha }}</td>
+                <td class="c-concepto">{{ mov.concepto }}</td>
+                <td class="c-tipo">
+                  <span class="badge" [class]="mov.tipo"><span class="dotb"></span>{{ mov.tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}</span>
+                </td>
+                <td class="c-monto tabular" [class.pos]="mov.tipo === 'ingreso'" [class.neg]="mov.tipo === 'egreso'">
+                  {{ mov.tipo === 'ingreso' ? '+' : '-' }}${{ mov.monto.toFixed(2) }}
+                </td>
+              </tr>
+            } @empty {
+              <tr><td class="empty-row" colspan="4">Aún no hay movimientos registrados.</td></tr>
+            }
+          </tbody>
+        </table>
+      </section>

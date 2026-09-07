@@ -1,0 +1,25 @@
+<article class="pcard">
+  @if (cantidadEnCarrito) {
+    <span class="pqty">{{ cantidadEnCarrito }}</span>
+  }
+
+  <figure class="pimg">
+    @if (producto.icono === 'bebida') {
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
+      </span>
+    } @else {
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 0-7 2-7 5 0 2 1 3 2 3-1 3-2 5-2 7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2c0-2-1-4-2-7 1 0 2-1 2-3 0-3-3-5-7-5Z"/><circle cx="9" cy="9" r=".6" fill="currentColor" stroke="none"/><circle cx="14" cy="8" r=".6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".6" fill="currentColor" stroke="none"/></svg>
+      </span>
+    }
+  </figure>
+
+  <button type="button" class="padd" [disabled]="sinExistencia" aria-label="Agregar {{ producto.nombre }} al pedido" (click)="agregar.emit()">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+  </button>
+
+  <h3 class="pname">{{ producto.nombre }}</h3>
+  <p class="pcat">{{ producto.categoria }}</p>
+  <p class="pprice">{{ sinExistencia ? 'Agotado' : '$' + producto.precio.toFixed(2) }}</p>
+</article>

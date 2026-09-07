@@ -1,0 +1,100 @@
+:host {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.sidebar {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 236px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 22px 16px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 22px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9px;
+}
+
+.brand-mark .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.brand-word {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-item,
+.nav-logout {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.68);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.nav-item .icon,
+.nav-logout .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.nav-logout {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nav-logout:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    min-height: 0;
+  }
+}

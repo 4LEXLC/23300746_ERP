@@ -1,0 +1,66 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>{{ editando ? 'Editar producto' : 'Agregar producto' }}</h3>
+        <p>{{ editando ? 'Actualiza los datos del producto' : 'Registra un nuevo producto en el inventario' }}</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="p-nombre">Nombre del producto <span class="req">*</span></label>
+        <input id="p-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Producto nuevo" required />
+      </section>
+
+      <section class="field-row">
+        <section class="field">
+          <label for="p-categoria">Categoría <span class="req">*</span></label>
+          <select id="p-categoria" class="box" name="categoria" [(ngModel)]="datos.categoria">
+            @for (categoria of categorias; track categoria) {
+              <option [value]="categoria">{{ categoria }}</option>
+            }
+          </select>
+        </section>
+        <section class="field">
+          <label for="p-precio">Precio de venta <span class="req">*</span></label>
+          <input id="p-precio" class="box" type="number" min="0" step="0.01" name="precio" [(ngModel)]="datos.precio" />
+        </section>
+      </section>
+
+      <section class="field">
+        <label for="p-desc">Descripción</label>
+        <textarea id="p-desc" class="box" name="descripcion" [(ngModel)]="datos.descripcion" placeholder="Descripción breve del producto"></textarea>
+      </section>
+
+      <section class="field-row3">
+        <section class="field">
+          <label for="p-exist">Existencia inicial</label>
+          <input id="p-exist" class="box" type="number" min="0" name="existencia" [(ngModel)]="datos.existencia" />
+        </section>
+        <section class="field">
+          <label for="p-min">Existencia mínima</label>
+          <input id="p-min" class="box" type="number" min="0" name="minimo" [(ngModel)]="datos.minimo" />
+        </section>
+        <section class="field">
+          <label for="p-estado">Estado</label>
+          <select id="p-estado" class="box" name="estado" [(ngModel)]="datos.estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </section>
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        {{ editando ? 'Guardar cambios' : 'Guardar producto' }}
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

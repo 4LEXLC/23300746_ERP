@@ -1,0 +1,78 @@
+      <header class="page-head">
+        <hgroup>
+          <h1>Compras y Proveedores</h1>
+          <p>{{ proveedores.length }} proveedores activos · {{ ordenes.length }} órdenes pendientes de recepción</p>
+        </hgroup>
+        <button type="button" class="add-btn" (click)="mostrarFormularioOrden = true">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          Nueva orden de compra
+        </button>
+      </header>
+
+      @if (mostrarFormularioOrden) {
+        <app-formulario-orden-compra
+          [proveedores]="nombresProveedores"
+          (cerrar)="mostrarFormularioOrden = false"
+          (guardar)="agregarOrdenCompra($event)"
+        />
+      }
+      @if (mostrarFormularioProveedor) {
+        <app-formulario-proveedor (cerrar)="mostrarFormularioProveedor = false" (guardar)="agregarProveedor($event)" />
+      }
+
+      <section class="card">
+        <header class="card-head">
+          <h3>Proveedores</h3>
+          <button type="button" class="mini-add" (click)="mostrarFormularioProveedor = true">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            Agregar
+          </button>
+        </header>
+        <ul class="prov-list">
+          @for (proveedor of proveedores; track proveedor.nombre) {
+            <li class="prov">
+              <span class="prov-ic"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="14" height="11"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></span></span>
+              <p class="prov-name">{{ proveedor.nombre }}</p>
+              <p class="prov-meta">{{ proveedor.telefono }}<br />{{ proveedor.correo }}</p>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="table-scroll" aria-label="Órdenes de compra" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Fecha</th>
+              <th>Proveedor</th>
+              <th>Productos</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (orden of ordenes; track orden.folio + $index) {
+              <tr>
+                <td><b>{{ orden.folio }}</b></td>
+                <td>{{ orden.fecha | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ orden.proveedor }}</td>
+                <td class="muted">{{ orden.items.length }} producto{{ orden.items.length === 1 ? '' : 's' }}</td>
+                <td class="price">${{ orden.total.toFixed(2) }}</td>
+                <td>
+                  <span class="badge" [class]="orden.estado">
+                    <span class="dotb"></span>
+                    {{ orden.estado === 'recibida' ? 'Recibida' : 'Pendiente' }}
+                  </span>
+                </td>
+                <td>
+                  @if (orden.estado === 'pendiente') {
+                    <button type="button" class="mini-add" (click)="marcarRecibida(orden)">Marcar como recibida</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>

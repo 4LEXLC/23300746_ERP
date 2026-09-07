@@ -1,0 +1,60 @@
+      <hgroup class="greet">
+        <h1>Hola</h1>
+        <p>{{ hoy | date: 'EEEE d \'de\' MMMM \'de\' y' }} · Este es el resumen de tu cafetería hoy</p>
+      </hgroup>
+
+      <ul class="stats">
+        @for (stat of estadisticas; track stat.etiqueta) {
+          <li class="stat">
+            <header class="stat-top">
+              <span class="stat-icon" [class.warn]="stat.alerta">
+                @if (stat.alerta) {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></span>
+                } @else {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L23 7H6"/></svg></span>
+                }
+              </span>
+              @if (stat.tendencia) {
+                <span class="trend"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>{{ stat.tendencia }}</span>
+              }
+            </header>
+            <p class="stat-val">{{ stat.valor }}</p>
+            <p class="stat-label">{{ stat.etiqueta }}</p>
+          </li>
+        }
+      </ul>
+
+      <header class="sec-head"><h2>Módulos del sistema</h2></header>
+      <ul class="modules">
+        @for (mod of modulos; track mod.ruta) {
+          <li class="mod">
+            <span class="mod-icon" [class]="mod.clase">
+              @switch (mod.icono) {
+                @case ('ventas') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L23 7H6"/></svg></span>
+                }
+                @case ('inventario') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/></svg></span>
+                }
+                @case ('facturacion') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg></span>
+                }
+                @case ('compras') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="14" height="11"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></span>
+                }
+                @case ('contabilidad') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5s-5 1.4-5 3.2c0 4 10 1.8 10 5.8 0 1.8-2.2 3.5-5 3.5s-5-1.6-5-3.5"/></svg></span>
+                }
+                @case ('rh') {
+                  <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                }
+              }
+            </span>
+            <h3>{{ mod.titulo }}</h3>
+            <p>{{ mod.descripcion }}</p>
+            <a class="mod-link" [routerLink]="mod.ruta">
+              Ver módulo<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </a>
+          </li>
+        }
+      </ul>

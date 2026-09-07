@@ -1,0 +1,17 @@
+@import '../../../compartidos/estilos/modal-formulario.css';
+
+.modal {
+  width: 600px;
+}
+
+.field-row,
+.field-row3 {
+  margin-top: 20px;
+  align-items: end;
+}
+
+.field-row > .field,
+.field-row3 > .field {
+  min-width: 0;
+  margin-top: 0;
+}

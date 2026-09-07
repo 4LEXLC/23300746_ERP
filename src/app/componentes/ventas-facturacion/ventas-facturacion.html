@@ -1,0 +1,77 @@
+      <header class="page-head">
+        <hgroup>
+          <h1>Ventas y Facturación</h1>
+          <p>{{ totalVentas }} ventas este mes · {{ totalFacturadas }} facturas emitidas</p>
+        </hgroup>
+        <button type="button" class="f-select">Últimos 7 días<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+      </header>
+
+      <nav class="tabs">
+        <button type="button" class="tab" [class.active]="pestanaActiva === 'ventas'" (click)="pestanaActiva = 'ventas'">Historial de ventas</button>
+        <button type="button" class="tab" [class.active]="pestanaActiva === 'facturas'" (click)="pestanaActiva = 'facturas'">Facturas</button>
+      </nav>
+
+      <section class="layout">
+        <section class="table-scroll" aria-label="Ventas y facturación" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Fecha</th>
+                <th>Cajero</th>
+                <th>Total</th>
+                <th>Pago</th>
+                <th>Estado del pago</th>
+                <th>Factura</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (venta of ventasMostradas; track venta.folio + $index) {
+                <tr>
+                  <td class="folio-cell"><b>{{ venta.folio }}</b><p class="muted">{{ venta.productos }} productos</p></td>
+                  <td>{{ venta.fecha | date: 'dd/MM/yyyy' }}<p class="muted">{{ venta.fecha | date: 'HH:mm' }}</p></td>
+                  <td>—</td>
+                  <td class="price">${{ venta.total.toFixed(2) }}</td>
+                  <td><span class="badge"><span class="dotb"></span>{{ venta.metodoPago }}</span></td>
+                  <td><span class="badge pagada"><span class="dotb"></span>Pagada</span></td>
+                  <td>
+                    @switch (venta.factura) {
+                      @case ('emitida') {
+                        <span class="link-btn">Ver factura</span><p class="muted">{{ venta.folioFactura }}</p>
+                        <button type="button" class="link-btn muted2" (click)="cancelarFactura(venta)">Cancelar factura</button>
+                      }
+                      @case ('pendiente') {
+                        <button type="button" class="link-btn" (click)="facturar(venta)">Facturar</button>
+                      }
+                      @default {
+                        <span class="link-btn muted2">Sin facturar</span>
+                      }
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td class="empty-row" colspan="7">No hay facturas emitidas todavía.</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+
+        <section class="card">
+          <h3>Generar factura</h3>
+          <p class="csub">Vista previa de factura</p>
+
+          <figure class="fac-box">
+            <figcaption class="fac-top"><b>{{ ultimaFactura || '—' }}</b><span class="fac-status">{{ ultimaFactura ? 'Vigente' : 'Sin generar' }}</span></figcaption>
+            <dl class="fac-preview">
+              <dt>Emisión</dt><dd>{{ ultimaFactura ? (hoy | date: 'dd/MM/yyyy') : '—' }}</dd>
+              <dt>Subtotal</dt><dd>${{ subtotalFacturado.toFixed(2) }}</dd>
+              <dt>IVA</dt><dd>${{ ivaFacturado.toFixed(2) }}</dd>
+              <dt>Total</dt><dd>${{ totalFacturado.toFixed(2) }}</dd>
+            </dl>
+          </figure>
+        </section>
+      </section>
+
+      @if (mostrarFormularioCliente) {
+        <app-formulario-cliente (cerrar)="mostrarFormularioCliente = false" (guardar)="generarFactura($event)" />
+      }

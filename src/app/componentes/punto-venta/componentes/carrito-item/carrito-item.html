@@ -1,0 +1,31 @@
+<li class="citem">
+  <figure class="cimg">
+    @if (item.producto.icono === 'bebida') {
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
+      </span>
+    } @else {
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 0-7 2-7 5 0 2 1 3 2 3-1 3-2 5-2 7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2c0-2-1-4-2-7 1 0 2-1 2-3 0-3-3-5-7-5Z"/></svg>
+      </span>
+    }
+  </figure>
+
+  <hgroup class="cinfo">
+    <p class="cname">{{ item.producto.nombre }}</p>
+    <p class="cunit">${{ item.producto.precio.toFixed(2) }} c/u</p>
+  </hgroup>
+
+  <span class="cright">
+    <p class="ctotal">${{ total.toFixed(2) }}</p>
+    <span class="stepper">
+      <button type="button" class="step-btn" aria-label="Quitar una unidad" (click)="decrementar.emit()">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      </button>
+      <span class="step-val">{{ item.cantidad }}</span>
+      <button type="button" class="step-btn" aria-label="Agregar una unidad" (click)="incrementar.emit()">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      </button>
+    </span>
+  </span>
+</li>

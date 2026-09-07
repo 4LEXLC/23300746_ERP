@@ -1,0 +1,78 @@
+<aside class="overlay" (click)="cerrar.emit()">
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>{{ editando ? 'Editar trabajador' : 'Agregar trabajador' }}</h3>
+        <p>{{ editando ? 'Actualiza el puesto, salario u horario del trabajador' : 'Registra un nuevo miembro del equipo' }}</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="t-nombre">Nombre completo <span class="req">*</span></label>
+        <input id="t-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Nombre y apellidos" required />
+      </section>
+      <section class="field-row">
+        <section class="field">
+          <label for="t-tel">Teléfono</label>
+          <input id="t-tel" class="box" type="tel" name="telefono" [(ngModel)]="datos.telefono" placeholder="33 0000 0000" />
+        </section>
+        <section class="field">
+          <label for="t-correo">Correo electrónico</label>
+          <input id="t-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" placeholder="correo@cafeteriaerp.mx" />
+        </section>
+      </section>
+
+      <p class="section-lbl">Puesto y salario</p>
+      <section class="field-row">
+        <section class="field">
+          <label for="t-puesto">Puesto <span class="req">*</span></label>
+          <select id="t-puesto" class="box" name="puesto" [(ngModel)]="datos.puesto">
+            @for (puesto of puestos; track puesto) {
+              <option [value]="puesto">{{ puesto }}</option>
+            }
+          </select>
+        </section>
+        <section class="field">
+          <label for="t-salario">Salario (quincenal) <span class="req">*</span></label>
+          <input id="t-salario" class="box" type="number" min="0" step="0.01" name="salario" [(ngModel)]="datos.salario" />
+        </section>
+      </section>
+      <section class="field">
+        <label for="t-fecha">Fecha de contratación <span class="req">*</span></label>
+        <input id="t-fecha" class="box" type="date" name="fechaContratacion" [(ngModel)]="datos.fechaContratacion" />
+      </section>
+
+      <p class="section-lbl">Horario laboral</p>
+      <section class="field-row3">
+        <section class="field">
+          <label for="t-dias">Días</label>
+          <select id="t-dias" class="box" name="dias" [(ngModel)]="datos.dias">
+            @for (dia of diasDisponibles; track dia) {
+              <option [value]="dia">{{ dia }}</option>
+            }
+          </select>
+        </section>
+        <section class="field">
+          <label for="t-entrada">Hora de entrada</label>
+          <input id="t-entrada" class="box" type="time" name="horaEntrada" [(ngModel)]="datos.horaEntrada" />
+        </section>
+        <section class="field">
+          <label for="t-salida">Hora de salida</label>
+          <input id="t-salida" class="box" type="time" name="horaSalida" [(ngModel)]="datos.horaSalida" />
+        </section>
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        {{ editando ? 'Guardar cambios' : 'Registrar trabajador' }}
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

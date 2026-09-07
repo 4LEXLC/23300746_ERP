@@ -1,0 +1,171 @@
+@import '../../../compartidos/estilos/modal-formulario.css';
+
+.modal {
+  width: 640px;
+}
+
+.items-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.items-head label {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.add-panel {
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+}
+
+.add-field {
+  margin-top: 0;
+}
+
+.add-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.mini-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 16px;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mini-add .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.items-list {
+  margin: 12px 0 0;
+  padding: 4px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  list-style: none;
+}
+
+.items-empty {
+  padding: 20px 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.oc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.oc-item:last-child {
+  border-bottom: none;
+}
+
+.oc-img {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 9px;
+}
+
+.oc-img .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.oc-info {
+  flex: 1;
+}
+
+.oc-name {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.oc-qty {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.oc-amt {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.oc-rm {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.oc-rm .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.box.static {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+}
+
+.oc-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1.5px solid var(--border);
+}
+
+.oc-total .l {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.oc-total .v {
+  font-family: 'Sora', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+}

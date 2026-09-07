@@ -1,0 +1,46 @@
+<section class="table-scroll" aria-label="Trabajadores" tabindex="0">
+  <table>
+    <thead>
+      <tr>
+        <th>Trabajador</th>
+        <th>Puesto</th>
+        <th>Salario</th>
+        <th>Horario</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (trabajador of trabajadores; track trabajador.nombre) {
+        <tr>
+          <td>
+            <span class="who">
+              <span class="who-av">{{ iniciales(trabajador.nombre) }}</span>
+              <p class="who-name">{{ trabajador.nombre }}</p>
+              <p class="who-mail">{{ trabajador.correo }}</p>
+            </span>
+          </td>
+          <td>{{ trabajador.puesto }}</td>
+          <td class="price">${{ trabajador.salario.toFixed(2) }} / quinc.</td>
+          <td>{{ trabajador.horario }}</td>
+          <td>
+            <span class="badge" [class]="trabajador.estado">
+              <span class="dotb"></span>{{ trabajador.estado === 'activo' ? 'Activo' : 'Baja' }}
+            </span>
+          </td>
+          <td>
+            <span class="actions-cell">
+              @if (trabajador.estado === 'activo') {
+                <button type="button" class="estado-btn" (click)="registrarAsistencia.emit(trabajador)">Registrar asistencia</button>
+              }
+              <button type="button" class="estado-btn" (click)="editar.emit(trabajador)">Editar</button>
+              <button type="button" class="estado-btn" (click)="cambiarEstado.emit(trabajador)">
+                {{ trabajador.estado === 'activo' ? 'Dar de baja' : 'Reactivar' }}
+              </button>
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
