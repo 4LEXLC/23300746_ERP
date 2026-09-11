@@ -1,3 +1,4 @@
+// Selección del método y simulación del pago.
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CarritoService, MetodoPago } from '../../compartidos/servicios/carrito.service';
@@ -22,15 +23,18 @@ export class Pago {
 
   procesandoPago = false;
 
+  // Actualiza el método de pago elegido.
   seleccionarMetodo(id: MetodoPago['id']): void {
     this.carritoService.metodoPago = id;
   }
 
+  // Libera la reserva y vuelve al pedido.
   volverAlPedido(): void {
     this.carritoService.cancelarConfirmacion();
     this.router.navigateByUrl('/punto-venta');
   }
 
+  // Simula el pago y continúa al comprobante.
   procesarPago(): void {
     if (this.procesandoPago) return;
     this.procesandoPago = true;

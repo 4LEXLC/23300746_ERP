@@ -1,4 +1,6 @@
+<!-- Captura de productos y cantidades de una compra. -->
 <aside class="overlay" (click)="cerrar.emit()">
+  <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
   <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
     <header class="modal-head">
       <hgroup>

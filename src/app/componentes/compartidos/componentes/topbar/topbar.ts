@@ -1,3 +1,4 @@
+// Barra superior con datos de la sesión.
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../servicios/auth.service';
@@ -11,6 +12,7 @@ import { AuthService } from '../../servicios/auth.service';
 export class Topbar {
   constructor(public authService: AuthService, private router: Router) {}
 
+  // Cierra la sesión actual.
   cerrarSesion(): void {
     this.authService.cerrarSesion();
     this.router.navigateByUrl('/login');

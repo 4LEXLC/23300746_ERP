@@ -1,3 +1,4 @@
+// Pruebas de: Resumen inicial y accesos a los módulos.
 import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Dashboard } from './dashboard';

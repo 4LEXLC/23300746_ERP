@@ -1,3 +1,4 @@
+/* Estilos globales y reglas compartidas de presentación. */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
 html,
@@ -26,6 +27,7 @@ app-rh {
   min-height: 100dvh;
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 1100px) {
   app-login .left {
     width: 44% !important;
@@ -62,6 +64,7 @@ app-rh {
 
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 768px) {
   :is(
       app-login,
@@ -309,6 +312,7 @@ app-rh {
 
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 520px) {
   app-login .hero p,
   app-login .features,
@@ -346,6 +350,7 @@ app-rh {
 }
 
 /* Cada tabla desplaza sus columnas dentro de su propio contenedor. */
+/* Permite desplazar tablas que exceden el ancho disponible. */
 .table-scroll {
   width: 100%;
   max-width: 100%;

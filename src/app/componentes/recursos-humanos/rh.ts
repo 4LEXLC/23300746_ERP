@@ -1,3 +1,4 @@
+// Trabajadores, asistencias, permisos y nómina.
 import { Component } from '@angular/core';
 import { DatosTrabajador, FormularioTrabajador } from './modales/formulario-trabajador/formulario-trabajador';
 import { DatosPermiso, FormularioPermiso } from './modales/formulario-permiso/formulario-permiso';
@@ -40,14 +41,17 @@ export class RH {
   mostrarFormularioPagoSalario = false;
   trabajadorEnEdicion: Trabajador | null = null;
 
+  // Cuenta los trabajadores activos.
   get activos(): number {
     return this.trabajadores.filter((t) => t.estado === 'activo').length;
   }
 
+  // Cuenta los trabajadores dados de baja.
   get bajas(): number {
     return this.trabajadores.filter((t) => t.estado === 'baja').length;
   }
 
+  // Lista los nombres de los trabajadores activos.
   get nombresTrabajadores(): string[] {
     return this.trabajadores.filter((t) => t.estado === 'activo').map((t) => t.nombre);
   }
@@ -64,6 +68,7 @@ export class RH {
     { nombre: 'Jorge Medina', tipo: 'Permiso', fechas: '2026-09-08 — 2026-09-08', estado: 'aprobado' },
   ];
 
+  // Cuenta las solicitudes pendientes.
   get permisosPendientes(): number {
     return this.permisos.filter((p) => p.estado === 'pendiente').length;
   }
@@ -74,20 +79,24 @@ export class RH {
     { trabajador: 'María Torres', puesto: 'Repostera', periodo: '2026-08-17 — 2026-08-23', monto: 1660, fechaPago: '2026-08-24', estado: 'pagado' },
   ];
 
+  // Lista los trabajadores con pagos pendientes.
   get trabajadoresConPagoPendiente(): string[] {
     return this.pagos.filter((p) => p.estado === 'pendiente').map((p) => p.trabajador);
   }
 
+  // Abre el formulario para registrar un trabajador.
   abrirNuevoTrabajador(): void {
     this.trabajadorEnEdicion = null;
     this.mostrarFormularioTrabajador = true;
   }
 
+  // Carga el trabajador elegido en el formulario.
   editarTrabajador(trabajador: Trabajador): void {
     this.trabajadorEnEdicion = trabajador;
     this.mostrarFormularioTrabajador = true;
   }
 
+  // Crea o actualiza el trabajador y su horario.
   guardarTrabajador(datos: DatosTrabajador): void {
     const horario = `${datos.dias} · ${datos.horaEntrada}-${datos.horaSalida}`;
     if (this.trabajadorEnEdicion) {
@@ -114,6 +123,7 @@ export class RH {
     this.mostrarFormularioTrabajador = false;
   }
 
+  // Guarda una solicitud pendiente de aprobación.
   agregarPermiso(datos: DatosPermiso): void {
     this.permisos = [
       ...this.permisos,
@@ -127,6 +137,7 @@ export class RH {
     this.mostrarFormularioPermiso = false;
   }
 
+  // Actualiza la nómina y registra el egreso del salario.
   registrarPagoSalario(datos: DatosPagoSalario): void {
     const periodo = `${datos.periodoInicio} — ${datos.periodoFin}`;
     const tienePendiente = this.pagos.some((p) => p.trabajador === datos.trabajador && p.estado === 'pendiente');
@@ -155,14 +166,17 @@ export class RH {
     this.mostrarFormularioPagoSalario = false;
   }
 
+  // Marca la solicitud como aprobada.
   aprobarPermiso(permiso: Permiso): void {
     this.permisos = this.permisos.map((p) => (p === permiso ? { ...p, estado: 'aprobado' } : p));
   }
 
+  // Marca la solicitud como rechazada.
   rechazarPermiso(permiso: Permiso): void {
     this.permisos = this.permisos.map((p) => (p === permiso ? { ...p, estado: 'rechazado' } : p));
   }
 
+  // Alterna entre activo y baja.
   cambiarEstadoTrabajador(trabajador: Trabajador): void {
     this.trabajadores = this.trabajadores.map((t) =>
       t === trabajador ? { ...t, estado: t.estado === 'activo' ? 'baja' : 'activo' } : t,
@@ -186,6 +200,7 @@ export class RH {
       : indiceHoy >= indiceInicio || indiceHoy <= indiceFin;
   }
 
+  // Registra la entrada y determina puntualidad o jornada extra.
   registrarAsistencia(trabajador: Trabajador): void {
     const ahora = new Date();
     const hora = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false });

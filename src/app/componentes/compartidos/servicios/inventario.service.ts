@@ -1,3 +1,4 @@
+// Productos y movimientos de inventario en memoria.
 import { Injectable } from '@angular/core';
 
 export interface ProductoInventario {
@@ -52,35 +53,42 @@ export class InventarioService {
     { producto: 'Pay de queso', tipo: 'entrada', cantidad: 12, motivo: 'Compra recibida', fecha: new Date() },
   ];
 
+  // Agrega un producto con un SKU consecutivo.
   agregarProducto(producto: Omit<ProductoInventario, 'sku'>): void {
     const consecutivo = (this.productos.length + 1).toString().padStart(4, '0');
     this.productos.push({ ...producto, sku: `SKU-${consecutivo}` });
   }
 
+  // Actualiza el producto que coincide con el SKU.
   editarProducto(sku: string, cambios: Omit<ProductoInventario, 'sku'>): void {
     this.productos = this.productos.map((p) => (p.sku === sku ? { ...p, ...cambios } : p));
   }
 
+  // Cambia entre activo e inactivo.
   alternarEstado(sku: string): void {
     this.productos = this.productos.map((p) =>
       p.sku === sku ? { ...p, estado: p.estado === 'activo' ? 'inactivo' : 'activo' } : p,
     );
   }
 
+  // Comprueba si alcanza la cantidad disponible.
   verificarExistencia(nombre: string, cantidad: number): boolean {
     return this.existenciaDe(nombre) >= cantidad;
   }
 
+  // Obtiene el nivel de disponibilidad del producto.
   estado(producto: ProductoInventario): 'agotado' | 'alerta' | 'disponible' {
     if (producto.existencia <= 0) return 'agotado';
     if (producto.existencia <= producto.minimo) return 'alerta';
     return 'disponible';
   }
 
+  // Consulta las unidades disponibles.
   existenciaDe(nombre: string): number {
     return this.productos.find((p) => p.nombre === nombre)?.existencia ?? 0;
   }
 
+  // Descuenta las unidades vendidas y registra la salida.
   registrarVenta(nombre: string, cantidad: number): void {
     const producto = this.productos.find((p) => p.nombre === nombre);
     if (!producto) return;
@@ -91,12 +99,14 @@ export class InventarioService {
     ];
   }
 
+  // Devuelve al inventario las unidades reservadas.
   liberarReserva(nombre: string, cantidad: number): void {
     const producto = this.productos.find((p) => p.nombre === nombre);
     if (!producto) return;
     producto.existencia += cantidad;
   }
 
+  // Suma las unidades recibidas y registra sus entradas.
   registrarEntradaPorCompra(items: { nombre: string; cantidad: number }[], proveedor: string): void {
     for (const item of items) {
       const producto = this.productos.find((p) => p.nombre === item.nombre);

@@ -1,3 +1,4 @@
+// Resumen inicial y accesos a los módulos.
 import { Component, LOCALE_ID } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEsMx from '@angular/common/locales/es-MX';

@@ -1,3 +1,4 @@
+// Estructura compartida de las pantallas administrativas.
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';

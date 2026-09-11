@@ -1,3 +1,4 @@
+// Solicitudes de permisos y acciones de aprobación.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Permiso } from '../../rh.models';
 
@@ -8,6 +9,7 @@ import { Permiso } from '../../rh.models';
   templateUrl: './lista-permisos.html',
 })
 export class ListaPermisos {
+  // Recibe datos del componente padre o le comunica acciones.
   @Input() permisos: Permiso[] = [];
   @Output() nuevaSolicitud = new EventEmitter<void>();
   @Output() aprobar = new EventEmitter<Permiso>();

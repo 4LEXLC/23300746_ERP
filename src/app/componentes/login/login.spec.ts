@@ -1,3 +1,4 @@
+// Pruebas de: Inicio de sesión con usuarios de demostración.
 import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Login } from './login';

@@ -1,3 +1,4 @@
+// Selección de productos y confirmación del pedido.
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -27,10 +28,12 @@ export class PuntoVenta {
   categoriaActiva = 'Todos';
   busqueda = '';
 
+  // Obtiene las categorías sin repetirlas.
   get categorias(): string[] {
     return ['Todos', ...new Set(this.inventarioService.productos.map((p) => p.categoria))];
   }
 
+  // Obtiene los productos que utiliza esta pantalla.
   get productos(): Producto[] {
     return this.inventarioService.productos
       .filter((p) => p.estado === 'activo')
@@ -42,6 +45,7 @@ export class PuntoVenta {
       }));
   }
 
+  // Filtra los productos según los controles de búsqueda.
   get productosFiltrados(): Producto[] {
     let lista = this.productos;
     if (this.categoriaActiva !== 'Todos') {
@@ -54,23 +58,28 @@ export class PuntoVenta {
     return lista;
   }
 
+  // Cambia la categoría de búsqueda.
   seleccionarCategoria(categoria: string) {
     this.categoriaActiva = categoria;
   }
 
+  // Consulta las unidades disponibles.
   existenciaDe(producto: Producto): number {
     return this.inventarioService.existenciaDe(producto.nombre);
   }
 
+  // Consulta las unidades añadidas al pedido.
   cantidadEnCarrito(producto: Producto): number {
     return this.carritoService.cantidadDe(producto);
   }
 
+  // Agrega una unidad si queda existencia disponible.
   agregarAlCarrito(producto: Producto): void {
     if (this.existenciaDe(producto) <= this.cantidadEnCarrito(producto)) return;
     this.carritoService.agregar(producto);
   }
 
+  // Comprueba la existencia y continúa con la confirmación.
   confirmarVenta(): void {
     const exito = this.carritoService.confirmarVenta();
     if (!exito) {
@@ -81,6 +90,7 @@ export class PuntoVenta {
     this.router.navigateByUrl('/pago');
   }
 
+  // Cierra la sesión actual.
   cerrarSesion(): void {
     this.authService.cerrarSesion();
     this.router.navigateByUrl('/login');

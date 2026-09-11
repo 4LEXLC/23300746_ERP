@@ -1,3 +1,4 @@
+// Listado de trabajadores y acciones disponibles.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { iniciales, Trabajador } from '../../rh.models';
 
@@ -8,6 +9,7 @@ import { iniciales, Trabajador } from '../../rh.models';
   templateUrl: './tabla-trabajadores.html',
 })
 export class TablaTrabajadores {
+  // Recibe datos del componente padre o le comunica acciones.
   @Input() trabajadores: Trabajador[] = [];
   @Output() cambiarEstado = new EventEmitter<Trabajador>();
   @Output() editar = new EventEmitter<Trabajador>();

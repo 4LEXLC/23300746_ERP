@@ -1,3 +1,4 @@
+// Captura y edición de trabajadores.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Trabajador } from '../../rh.models';
@@ -21,6 +22,7 @@ export interface DatosTrabajador {
   styleUrl: './formulario-trabajador.css',
 })
 export class FormularioTrabajador {
+  // Recibe datos del componente padre o le comunica acciones.
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosTrabajador>();
 
@@ -29,6 +31,7 @@ export class FormularioTrabajador {
 
   editando = false;
 
+  // Separa el horario y carga los datos del trabajador.
   @Input() set trabajadorEditar(trabajador: Trabajador | null) {
     if (!trabajador) return;
     const [dias, horas] = trabajador.horario.split(' · ');
@@ -59,6 +62,7 @@ export class FormularioTrabajador {
     horaSalida: '16:00',
   };
 
+  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
     this.guardar.emit(this.datos);
   }

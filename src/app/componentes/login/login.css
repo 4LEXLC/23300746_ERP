@@ -1,3 +1,4 @@
+/* Inicio de sesión con usuarios de demostración. */
 * {
   box-sizing: border-box;
 }
@@ -377,6 +378,7 @@ input::placeholder {
   text-align: center;
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 900px) {
   .left {
     width: 430px;
@@ -392,6 +394,7 @@ input::placeholder {
   }
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 720px) {
   :host {
     display: block;
@@ -426,6 +429,7 @@ input::placeholder {
   }
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 420px) {
   .left {
     padding: 28px 22px;

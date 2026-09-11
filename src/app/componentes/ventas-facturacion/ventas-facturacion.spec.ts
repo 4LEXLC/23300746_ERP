@@ -1,3 +1,4 @@
+// Pruebas de: Historial de ventas y gestión de facturas.
 import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VentasFacturacion } from './ventas-facturacion';

@@ -1,3 +1,4 @@
+/* Estilos compartidos de ventanas modales y sus campos. */
 * {
   box-sizing: border-box;
 }
@@ -21,6 +22,7 @@ h3 {
   font-family: 'Sora', system-ui, sans-serif;
 }
 
+/* Fondo que cubre la pantalla detrás del modal. */
 .overlay {
   position: fixed;
   inset: 0;
@@ -31,6 +33,7 @@ h3 {
   background: rgba(36, 28, 20, 0.5);
 }
 
+/* Tamaño y distribución de la ventana del formulario. */
 .modal {
   display: flex;
   flex-direction: column;
@@ -157,6 +160,7 @@ select.box {
   gap: 14px;
 }
 
+/* Ajustes según el tamaño de pantalla. */
 @media (max-width: 520px) {
   .field-row,
   .field-row3 {

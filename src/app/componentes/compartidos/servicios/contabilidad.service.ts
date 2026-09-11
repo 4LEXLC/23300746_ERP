@@ -1,3 +1,4 @@
+// Movimientos contables y cálculos del resumen financiero.
 import { Injectable } from '@angular/core';
 
 export type CategoriaEgreso = 'Insumos y proveedores' | 'Nómina' | 'Servicios y renta';
@@ -26,34 +27,42 @@ export class ContabilidadService {
     { fecha: '2026-09-05', concepto: 'Venta del día', tipo: 'ingreso', monto: 3450 },
   ];
 
+  // Agrega un ingreso con la fecha actual.
   registrarIngreso(concepto: string, monto: number): void {
     this.movimientos = [{ fecha: this.hoy(), concepto, tipo: 'ingreso', monto }, ...this.movimientos];
   }
 
+  // Agrega un egreso con su categoría.
   registrarEgreso(concepto: string, monto: number, categoria: CategoriaEgreso): void {
     this.movimientos = [{ fecha: this.hoy(), concepto, tipo: 'egreso', monto, categoria }, ...this.movimientos];
   }
 
+  // Obtiene la fecha UTC en formato año-mes-día.
   private hoy(): string {
     return new Date().toISOString().slice(0, 10);
   }
 
+  // Suma los movimientos de ingreso.
   get ingresos(): number {
     return this.movimientos.filter((m) => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
   }
 
+  // Obtiene el total de egresos.
   get egresosTotal(): number {
     return this.movimientos.filter((m) => m.tipo === 'egreso').reduce((s, m) => s + m.monto, 0);
   }
 
+  // Resta los egresos a los ingresos.
   get utilidad(): number {
     return this.ingresos - this.egresosTotal;
   }
 
+  // Separa el IVA incluido en los ingresos.
   get ivaRecaudado(): number {
     return this.ingresos - this.ingresos / 1.16;
   }
 
+  // Obtiene los indicadores financieros.
   get kpis(): { etiqueta: string; valor: number }[] {
     return [
       { etiqueta: 'Ingresos', valor: this.ingresos },
@@ -63,6 +72,7 @@ export class ContabilidadService {
     ];
   }
 
+  // Agrupa los gastos y calcula su porcentaje.
   get egresosPorCategoria(): { nombre: string; color: string; porcentaje: number; monto: number }[] {
     const categorias: CategoriaEgreso[] = ['Insumos y proveedores', 'Nómina', 'Servicios y renta'];
     const total = this.egresosTotal || 1;

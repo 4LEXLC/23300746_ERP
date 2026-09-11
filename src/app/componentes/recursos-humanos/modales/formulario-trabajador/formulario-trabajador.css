@@ -1,5 +1,7 @@
+/* Reutiliza el estilo común del formulario. */
 @import '../../../compartidos/estilos/modal-formulario.css';
 
+/* Tamaño y distribución de la ventana del formulario. */
 .modal {
   width: 600px;
 }

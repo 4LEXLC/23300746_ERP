@@ -1,3 +1,4 @@
+// Ventas y folios de facturas en memoria.
 import { Injectable } from '@angular/core';
 
 export interface Venta {
@@ -18,14 +19,17 @@ export class VentasService {
     { folio: 'V-1040', fecha: new Date('2026-09-04T18:20:00'), productos: 5, total: 243, metodoPago: 'Tarjeta', factura: 'sin-facturar' },
   ];
 
+  // Obtiene la cantidad de ventas registradas.
   get totalVentas(): number {
     return this.ventas.length;
   }
 
+  // Cuenta las ventas con factura emitida.
   get totalFacturadas(): number {
     return this.ventas.filter((v) => v.factura === 'emitida').length;
   }
 
+  // Crea la venta con folio y estado de facturación.
   registrarVenta(productos: number, total: number, metodoPago: string, solicitaFactura: boolean): Venta {
     const consecutivo = 1042 + this.ventas.length;
     const venta: Venta = {
@@ -40,6 +44,7 @@ export class VentasService {
     return venta;
   }
 
+  // Genera el folio y actualiza los datos de la factura.
   generarFactura(venta: Venta): string {
     const consecutivo = (this.totalFacturadas + 1).toString().padStart(4, '0');
     venta.factura = 'emitida';
@@ -47,6 +52,7 @@ export class VentasService {
     return venta.folioFactura;
   }
 
+  // Retira la factura de la venta.
   cancelarFactura(venta: Venta): void {
     venta.factura = 'sin-facturar';
     venta.folioFactura = undefined;

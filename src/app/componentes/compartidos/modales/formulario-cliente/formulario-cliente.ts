@@ -1,3 +1,4 @@
+// Captura de datos del cliente para facturación.
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -16,6 +17,7 @@ export interface DatosCliente {
   styleUrl: './formulario-cliente.css',
 })
 export class FormularioCliente {
+  // Recibe datos del componente padre o le comunica acciones.
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosCliente>();
 
@@ -29,6 +31,7 @@ export class FormularioCliente {
     correo: '',
   };
 
+  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
     this.guardar.emit(this.datos);
   }

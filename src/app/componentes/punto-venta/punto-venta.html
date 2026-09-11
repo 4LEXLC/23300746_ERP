@@ -1,3 +1,4 @@
+<!-- Selección de productos y confirmación del pedido. -->
 @if (authService.esAdmin) {
   <app-sidebar />
 }
@@ -39,6 +40,8 @@
     }
   </nav>
 
+  <!-- Catálogo de productos disponibles para el pedido. -->
+
   <section class="grid">
     @for (producto of productosFiltrados; track producto.nombre) {
       <app-producto-card
@@ -50,6 +53,8 @@
     }
   </section>
 </main>
+
+<!-- Productos del pedido y resumen del cobro. -->
 
 <aside class="cart">
   <header class="cart-head">

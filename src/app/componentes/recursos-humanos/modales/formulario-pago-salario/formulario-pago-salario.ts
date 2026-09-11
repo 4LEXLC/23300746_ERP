@@ -1,3 +1,4 @@
+// Captura de pagos de salario.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -16,6 +17,7 @@ export interface DatosPagoSalario {
   styleUrl: './formulario-pago-salario.css',
 })
 export class FormularioPagoSalario {
+  // Recibe datos del componente padre o le comunica acciones.
   @Input() trabajadores: string[] = [];
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosPagoSalario>();
@@ -28,6 +30,7 @@ export class FormularioPagoSalario {
     fechaPago: '',
   };
 
+  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
     this.guardar.emit(this.datos);
   }

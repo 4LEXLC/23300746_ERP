@@ -1,3 +1,4 @@
+// Tipos de datos compartidos por recursos humanos.
 export interface PagoNomina {
   trabajador: string;
   puesto: string;
@@ -29,6 +30,7 @@ export interface Permiso {
   estado: 'pendiente' | 'aprobado' | 'rechazado';
 }
 
+// Forma las iniciales con las primeras dos palabras del nombre.
 export function iniciales(nombre: string): string {
   return nombre
     .split(' ')

@@ -1,3 +1,4 @@
+// Pruebas de: Comprobante de venta y solicitud de factura.
 import { vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';

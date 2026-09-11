@@ -1,3 +1,4 @@
+// Proveedores, órdenes de compra y recepción de productos.
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { DatosProveedor, FormularioProveedor } from './modales/formulario-proveedor/formulario-proveedor';
@@ -61,10 +62,12 @@ export class CompraProveedores {
   mostrarFormularioProveedor = false;
   mostrarFormularioOrden = false;
 
+  // Obtiene los nombres para el selector de proveedores.
   get nombresProveedores(): string[] {
     return this.proveedores.map((p) => p.nombre);
   }
 
+  // Guarda el proveedor y cierra el formulario.
   agregarProveedor(datos: DatosProveedor): void {
     this.proveedores.push({
       nombre: datos.nombre,
@@ -74,6 +77,7 @@ export class CompraProveedores {
     this.mostrarFormularioProveedor = false;
   }
 
+  // Calcula el total y guarda la orden de compra.
   agregarOrdenCompra(datos: DatosOrdenCompra): void {
     const consecutivo = (this.ordenes.length + 1).toString().padStart(4, '0');
     const total = datos.items.reduce((suma, item) => suma + item.cantidad * item.precioUnitario, 0);
@@ -88,6 +92,7 @@ export class CompraProveedores {
     this.mostrarFormularioOrden = false;
   }
 
+  // Recibe la compra una sola vez y registra inventario y egreso.
   marcarRecibida(orden: OrdenCompra): void {
     if (orden.estado === 'recibida') return;
     orden.estado = 'recibida';

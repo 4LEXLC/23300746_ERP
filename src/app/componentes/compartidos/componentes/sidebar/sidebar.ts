@@ -1,3 +1,4 @@
+// Menú de navegación entre módulos.
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 

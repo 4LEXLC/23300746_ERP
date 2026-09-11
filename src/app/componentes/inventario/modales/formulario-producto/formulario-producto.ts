@@ -1,3 +1,4 @@
+// Captura y edición de productos.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -18,6 +19,8 @@ export interface DatosProducto {
   styleUrl: './formulario-producto.css',
 })
 export class FormularioProducto {
+  // Copia el producto para editarlo desde el formulario.
+  // Recibe datos del componente padre o le comunica acciones.
   @Input() set productoEditar(producto: DatosProducto | null) {
     if (producto) {
       this.datos = { ...producto };
@@ -40,6 +43,7 @@ export class FormularioProducto {
     estado: 'activo',
   };
 
+  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
     this.guardar.emit(this.datos);
   }

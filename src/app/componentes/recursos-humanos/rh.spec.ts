@@ -1,3 +1,4 @@
+// Pruebas de: Trabajadores, asistencias, permisos y nómina.
 import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RH } from './rh';

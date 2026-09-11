@@ -1,3 +1,4 @@
+// Pedido compartido, reserva de existencia y registro del pago.
 import { Injectable } from '@angular/core';
 import { Producto } from '../../punto-venta/componentes/producto-card/producto-card';
 import { ItemCarrito } from '../../punto-venta/componentes/carrito-item/carrito-item';
@@ -23,26 +24,32 @@ export class CarritoService {
 
   ultimoFolio = '';
 
+  // Suma las unidades del carrito.
   get cantidadTotal(): number {
     return this.items.reduce((suma, i) => suma + i.cantidad, 0);
   }
 
+  // Suma los importes antes de IVA.
   get subtotal(): number {
     return this.items.reduce((suma, i) => suma + i.producto.precio * i.cantidad, 0);
   }
 
+  // Calcula el IVA del pedido.
   get iva(): number {
     return this.subtotal * IVA;
   }
 
+  // Calcula el importe total.
   get total(): number {
     return this.subtotal + this.iva;
   }
 
+  // Consulta las unidades de un producto en el carrito.
   cantidadDe(producto: Producto): number {
     return this.items.find((i) => i.producto.nombre === producto.nombre)?.cantidad ?? 0;
   }
 
+  // Agrega el producto o aumenta su cantidad.
   agregar(producto: Producto): void {
     const existe = this.items.some((i) => i.producto.nombre === producto.nombre);
     this.items = existe
@@ -50,12 +57,14 @@ export class CarritoService {
       : [...this.items, { producto, cantidad: 1 }];
   }
 
+  // Aumenta una unidad del producto.
   incrementar(item: ItemCarrito): void {
     this.items = this.items.map((i) =>
       i.producto.nombre === item.producto.nombre ? { ...i, cantidad: i.cantidad + 1 } : i,
     );
   }
 
+  // Resta una unidad y elimina el producto si llega a cero.
   decrementar(item: ItemCarrito): void {
     const nuevaCantidad = item.cantidad - 1;
     this.items =
@@ -64,11 +73,11 @@ export class CarritoService {
         : this.items.map((i) => (i.producto.nombre === item.producto.nombre ? { ...i, cantidad: nuevaCantidad } : i));
   }
 
-  /** Confirmar venta: verifica existencia, la reserva (descuenta) y calcula subtotal/impuestos/total. */
+  /** Verifica y reserva las unidades del pedido. */
   confirmarVenta(): boolean {
     if (!this.items.length) return false;
 
-    // Ya estaba confirmada (p. ej. doble clic o el usuario volvió sin cambiar el pedido): no reservar dos veces.
+    // Evita descontar la existencia dos veces.
     if (this.ventaConfirmada) return true;
 
     const stockInsuficiente = this.items.some(
@@ -84,7 +93,7 @@ export class CarritoService {
     return true;
   }
 
-  /** Cancela una confirmación previa (p. ej. el usuario vuelve a editar el pedido) y libera la reserva de existencia. */
+  /** Cancela la confirmación y devuelve las unidades reservadas. */
   cancelarConfirmacion(): void {
     if (!this.ventaConfirmada) return;
     for (const item of this.items) {
@@ -93,7 +102,7 @@ export class CarritoService {
     this.ventaConfirmada = false;
   }
 
-  /** Procesar pago: interactúa con la pasarela de pago y registra la venta ya confirmada. */
+  /** Registra la venta y su ingreso; el pago es simulado. */
   procesarPago(): boolean {
     if (!this.ventaConfirmada) return false;
 
@@ -105,6 +114,7 @@ export class CarritoService {
     return true;
   }
 
+  // Reinicia el pedido y sus datos de pago.
   vaciar(): void {
     this.items = [];
     this.solicitaFactura = false;

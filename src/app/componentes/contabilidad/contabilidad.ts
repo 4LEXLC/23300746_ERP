@@ -1,3 +1,4 @@
+// Resumen de ingresos, egresos y reportes.
 import { Component } from '@angular/core';
 import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
 
@@ -13,14 +14,17 @@ export class Contabilidad {
   periodos = ['Hoy', 'Semana', 'Mes', 'Personalizado'];
   periodoActivo = 'Mes';
 
+  // Obtiene los indicadores financieros.
   get kpis() {
     return this.contabilidadService.kpis;
   }
 
+  // Obtiene los gastos agrupados por categoría.
   get egresos() {
     return this.contabilidadService.egresosPorCategoria;
   }
 
+  // Obtiene el historial de movimientos.
   get movimientos() {
     return this.contabilidadService.movimientos;
   }
@@ -29,6 +33,7 @@ export class Contabilidad {
     return this.contabilidadService.resumenMensual;
   }
 
+  // Calcula la referencia máxima para las barras del gráfico.
   get maxMensual(): number {
     const valores = this.resumenMensual.flatMap((m) => [m.ingresos, m.egresos]);
     return Math.max(1, ...valores);
@@ -38,14 +43,17 @@ export class Contabilidad {
     return this.contabilidadService.donutGradient;
   }
 
+  // Obtiene el total de egresos.
   get egresosTotal(): number {
     return this.contabilidadService.egresosTotal;
   }
 
+  // Abre la impresión del reporte.
   generarReporte(): void {
     window.print();
   }
 
+  // Descarga los movimientos como CSV para abrirlos en Excel.
   exportarExcel(): void {
     const encabezados = ['Fecha', 'Concepto', 'Tipo', 'Monto'];
     const filas = this.movimientos.map((m) => [m.fecha, m.concepto, m.tipo, m.monto.toFixed(2)]);

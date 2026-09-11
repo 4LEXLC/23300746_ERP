@@ -1,3 +1,4 @@
+// Inicio de sesión con usuarios de demostración.
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ export class Login {
   contrasena = '';
   error = '';
 
+  // Valida las credenciales e inicia la sesión.
   iniciarSesion(): void {
     if (!this.usuario.trim() || !this.contrasena.trim()) {
       this.error = 'Ingresa tu usuario y contraseña para continuar.';

@@ -1,7 +1,10 @@
+<!-- Resumen inicial y accesos a los módulos. -->
       <hgroup class="greet">
         <h1>Hola</h1>
         <p>{{ hoy | date: 'EEEE d \'de\' MMMM \'de\' y' }} · Este es el resumen de tu cafetería hoy</p>
       </hgroup>
+
+      <!-- Indicadores iniciales del tablero. -->
 
       <ul class="stats">
         @for (stat of estadisticas; track stat.etiqueta) {
