@@ -9,6 +9,8 @@ export interface PagoNomina {
 }
 
 export interface Trabajador {
+  id_trabajador?: number;
+  id_puesto?: number;
   nombre: string;
   correo: string;
   puesto: string;
@@ -18,12 +20,16 @@ export interface Trabajador {
 }
 
 export interface Asistencia {
+  id_asistencia?: number;
+  id_trabajador?: number;
   nombre: string;
   detalle: string;
   estado: 'a-tiempo' | 'retardo' | 'falta' | 'extra';
 }
 
 export interface Permiso {
+  id_permiso?: number;
+  id_trabajador?: number;
   nombre: string;
   tipo: string;
   fechas: string;

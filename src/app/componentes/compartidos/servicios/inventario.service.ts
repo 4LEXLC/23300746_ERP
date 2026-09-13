@@ -1,7 +1,10 @@
-// Productos y movimientos de inventario en memoria.
+// Productos y movimientos de inventario contra el backend real (tabla producto / movimiento_inventario).
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from './api.config';
 
 export interface ProductoInventario {
+  id_producto?: number;
   nombre: string;
   sku: string;
   categoria: string;
@@ -20,55 +23,85 @@ export interface MovimientoInventario {
   fecha: Date;
 }
 
+interface ProductoBackend {
+  id_producto: number;
+  nombre: string;
+  descripcion: string;
+  categoria: string;
+  precio_venta: string | number;
+  stock: number;
+  stock_minimo: number;
+  imagen: string | null;
+  fecha_modificacion: string;
+  activo: number | boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InventarioService {
-  productos: ProductoInventario[] = [
-    { nombre: 'Café americano', sku: 'SKU-0001', categoria: 'Bebidas calientes', precio: 32, descripcion: 'Café de grano recién molido', existencia: 48, minimo: 15, estado: 'activo' },
-    { nombre: 'Capuchino', sku: 'SKU-0002', categoria: 'Bebidas calientes', precio: 42, descripcion: 'Espresso con leche vaporizada', existencia: 6, minimo: 15, estado: 'activo' },
-    { nombre: 'Latte', sku: 'SKU-0003', categoria: 'Bebidas calientes', precio: 40, descripcion: 'Espresso con leche cremosa', existencia: 22, minimo: 12, estado: 'activo' },
-    { nombre: 'Chocolate caliente', sku: 'SKU-0004', categoria: 'Bebidas calientes', precio: 38, descripcion: 'Chocolate con leche entera', existencia: 18, minimo: 10, estado: 'activo' },
-    { nombre: 'Té chai', sku: 'SKU-0005', categoria: 'Bebidas calientes', precio: 35, descripcion: 'Infusión especiada con leche', existencia: 14, minimo: 8, estado: 'activo' },
-    { nombre: 'Frappé de vainilla', sku: 'SKU-0006', categoria: 'Bebidas frías', precio: 48, descripcion: 'Bebida helada a base de café', existencia: 20, minimo: 10, estado: 'activo' },
-    { nombre: 'Frappé de moka', sku: 'SKU-0007', categoria: 'Bebidas frías', precio: 48, descripcion: 'Bebida helada con chocolate', existencia: 16, minimo: 10, estado: 'activo' },
-    { nombre: 'Café helado', sku: 'SKU-0008', categoria: 'Bebidas frías', precio: 36, descripcion: 'Café de grano servido con hielo', existencia: 25, minimo: 10, estado: 'activo' },
-    { nombre: 'Croissant de mantequilla', sku: 'SKU-0009', categoria: 'Repostería', precio: 28, descripcion: 'Horneado diariamente', existencia: 0, minimo: 8, estado: 'activo' },
-    { nombre: 'Pay de queso', sku: 'SKU-0010', categoria: 'Repostería', precio: 45, descripcion: 'Rebanada individual', existencia: 12, minimo: 5, estado: 'activo' },
-    { nombre: 'Muffin de arándano', sku: 'SKU-0011', categoria: 'Repostería', precio: 32, descripcion: 'Horneado con arándanos naturales', existencia: 15, minimo: 6, estado: 'activo' },
-    { nombre: 'Sándwich de jamón y queso', sku: 'SKU-0012', categoria: 'Alimentos', precio: 55, descripcion: 'Pan artesanal', existencia: 9, minimo: 10, estado: 'activo' },
-    { nombre: 'Espresso', sku: 'SKU-0013', categoria: 'Bebidas calientes', precio: 28, descripcion: 'Shot doble de espresso', existencia: 35, minimo: 15, estado: 'activo' },
-    { nombre: 'Macchiato', sku: 'SKU-0014', categoria: 'Bebidas calientes', precio: 40, descripcion: 'Espresso marcado con espuma de leche', existencia: 10, minimo: 12, estado: 'activo' },
-    { nombre: 'Té helado de limón', sku: 'SKU-0015', categoria: 'Bebidas frías', precio: 30, descripcion: 'Infusión de té negro con limón', existencia: 19, minimo: 8, estado: 'activo' },
-    { nombre: 'Limonada de fresa', sku: 'SKU-0016', categoria: 'Bebidas frías', precio: 34, descripcion: 'Limonada natural con fresa', existencia: 8, minimo: 10, estado: 'activo' },
-    { nombre: 'Concha', sku: 'SKU-0017', categoria: 'Repostería', precio: 22, descripcion: 'Pan dulce tradicional', existencia: 26, minimo: 10, estado: 'activo' },
-    { nombre: 'Brownie', sku: 'SKU-0018', categoria: 'Repostería', precio: 30, descripcion: 'Brownie de chocolate con nuez', existencia: 0, minimo: 6, estado: 'activo' },
-    { nombre: 'Bagel con queso crema', sku: 'SKU-0019', categoria: 'Alimentos', precio: 42, descripcion: 'Bagel tostado con queso crema', existencia: 13, minimo: 8, estado: 'activo' },
-    { nombre: 'Ensalada de pollo', sku: 'SKU-0020', categoria: 'Alimentos', precio: 65, descripcion: 'Ensalada fresca con pollo a la plancha', existencia: 5, minimo: 6, estado: 'inactivo' },
-  ];
+  private readonly apiUrl = `${API_URL}/producto`;
 
-  movimientos: MovimientoInventario[] = [
-    { producto: 'Café americano', tipo: 'entrada', cantidad: 30, motivo: 'Compra recibida', fecha: new Date() },
-    { producto: 'Capuchino', tipo: 'salida', cantidad: 24, motivo: 'Venta registrada', fecha: new Date() },
-    { producto: 'Frappé de vainilla', tipo: 'salida', cantidad: 15, motivo: 'Venta registrada', fecha: new Date() },
-    { producto: 'Croissant de mantequilla', tipo: 'merma', cantidad: 4, motivo: 'Producto caducado', fecha: new Date() },
-    { producto: 'Pay de queso', tipo: 'entrada', cantidad: 12, motivo: 'Compra recibida', fecha: new Date() },
-  ];
+  productos: ProductoInventario[] = [];
 
-  // Agrega un producto con un SKU consecutivo.
+  movimientos: MovimientoInventario[] = [];
+
+  constructor(private http: HttpClient) {
+    this.cargarProductos();
+  }
+
+  private cargarProductos(): void {
+    this.http.get<ProductoBackend[]>(this.apiUrl).subscribe((datos) => {
+      this.productos = datos.map((p) => this.aFrontend(p));
+    });
+  }
+
+  private aFrontend(p: ProductoBackend): ProductoInventario {
+    return {
+      id_producto: p.id_producto,
+      nombre: p.nombre,
+      sku: `SKU-${String(p.id_producto).padStart(4, '0')}`,
+      categoria: p.categoria,
+      precio: Number(p.precio_venta),
+      descripcion: p.descripcion,
+      existencia: p.stock,
+      minimo: p.stock_minimo,
+      estado: (p.activo === true || p.activo === 1) ? 'activo' : 'inactivo',
+    };
+  }
+
+  private aBackend(producto: Omit<ProductoInventario, 'sku'>) {
+    return {
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      categoria: producto.categoria,
+      precio_venta: producto.precio,
+      stock: producto.existencia,
+      stock_minimo: producto.minimo,
+      imagen: null,
+      activo: producto.estado === 'activo',
+    };
+  }
+
+  // Agrega un producto en el backend y lo refleja en la lista local.
   agregarProducto(producto: Omit<ProductoInventario, 'sku'>): void {
-    const consecutivo = (this.productos.length + 1).toString().padStart(4, '0');
-    this.productos.push({ ...producto, sku: `SKU-${consecutivo}` });
+    this.http.post<ProductoBackend>(this.apiUrl, this.aBackend(producto)).subscribe((creado) => {
+      this.productos = [...this.productos, this.aFrontend(creado)];
+    });
   }
 
   // Actualiza el producto que coincide con el SKU.
   editarProducto(sku: string, cambios: Omit<ProductoInventario, 'sku'>): void {
-    this.productos = this.productos.map((p) => (p.sku === sku ? { ...p, ...cambios } : p));
+    const actual = this.productos.find((p) => p.sku === sku);
+    if (!actual?.id_producto) return;
+    this.http.put<ProductoBackend>(`${this.apiUrl}/${actual.id_producto}`, this.aBackend(cambios)).subscribe((actualizado) => {
+      this.productos = this.productos.map((p) => (p.sku === sku ? this.aFrontend(actualizado) : p));
+    });
   }
 
   // Cambia entre activo e inactivo.
   alternarEstado(sku: string): void {
-    this.productos = this.productos.map((p) =>
-      p.sku === sku ? { ...p, estado: p.estado === 'activo' ? 'inactivo' : 'activo' } : p,
-    );
+    const actual = this.productos.find((p) => p.sku === sku);
+    if (!actual) return;
+    this.editarProducto(sku, { ...actual, estado: actual.estado === 'activo' ? 'inactivo' : 'activo' });
   }
 
   // Comprueba si alcanza la cantidad disponible.
@@ -88,11 +121,12 @@ export class InventarioService {
     return this.productos.find((p) => p.nombre === nombre)?.existencia ?? 0;
   }
 
-  // Descuenta las unidades vendidas y registra la salida.
+  // Descuenta las unidades vendidas, actualiza el backend y registra la salida.
   registrarVenta(nombre: string, cantidad: number): void {
     const producto = this.productos.find((p) => p.nombre === nombre);
     if (!producto) return;
     producto.existencia = Math.max(0, producto.existencia - cantidad);
+    this.persistirMovimiento(producto, 'salida', cantidad, 'Venta registrada');
     this.movimientos = [
       { producto: nombre, tipo: 'salida', cantidad, motivo: 'Venta registrada', fecha: new Date() },
       ...this.movimientos,
@@ -104,19 +138,32 @@ export class InventarioService {
     const producto = this.productos.find((p) => p.nombre === nombre);
     if (!producto) return;
     producto.existencia += cantidad;
+    this.persistirStock(producto);
   }
 
-  // Suma las unidades recibidas y registra sus entradas.
+  // Suma las unidades recibidas, actualiza el backend y registra sus entradas.
   registrarEntradaPorCompra(items: { nombre: string; cantidad: number }[], proveedor: string): void {
     for (const item of items) {
       const producto = this.productos.find((p) => p.nombre === item.nombre);
       if (producto) {
         producto.existencia += item.cantidad;
+        this.persistirMovimiento(producto, 'entrada', item.cantidad, `Compra recibida de ${proveedor}`);
       }
       this.movimientos = [
         { producto: item.nombre, tipo: 'entrada', cantidad: item.cantidad, motivo: `Compra recibida de ${proveedor}`, fecha: new Date() },
         ...this.movimientos,
       ];
     }
+  }
+
+  private persistirStock(producto: ProductoInventario): void {
+    if (!producto.id_producto) return;
+    this.http.put(`${this.apiUrl}/${producto.id_producto}`, this.aBackend(producto)).subscribe();
+  }
+
+  private persistirMovimiento(producto: ProductoInventario, tipo: 'entrada' | 'salida' | 'merma', cantidad: number, motivo: string): void {
+    if (!producto.id_producto) return;
+    this.persistirStock(producto);
+    this.http.post(`${API_URL}/movimiento_inventario`, { id_producto: producto.id_producto, tipo, cantidad, motivo }).subscribe();
   }
 }

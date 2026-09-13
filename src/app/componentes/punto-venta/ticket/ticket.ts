@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CarritoService } from '../../compartidos/servicios/carrito.service';
 
-import { FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';
+import { DatosCliente, FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';
 import { VentasService } from '../../compartidos/servicios/ventas.service';
 
 @Component({
@@ -23,14 +23,20 @@ export class Ticket {
   mostrarFormularioCliente = false;
 
   // Factura la última venta y prepara un nuevo pedido.
-  guardarFacturacion(): void {
+  guardarFacturacion(datosCliente: DatosCliente): void {
     const venta = this.ventasService.ventas.find(
       (venta) => venta.folio === this.carritoService.ultimoFolio,
     );
-    if (venta && venta.factura !== 'emitida') {
-      this.ventasService.generarFactura(venta);
-    }
     this.mostrarFormularioCliente = false;
+
+    if (venta && venta.factura !== 'emitida') {
+      this.ventasService.generarFactura(venta, datosCliente).subscribe(() => {
+        this.nuevaVenta();
+        void this.router.navigate(['/punto-venta']);
+      });
+      return;
+    }
+
     this.nuevaVenta();
     void this.router.navigate(['/punto-venta']);
   }

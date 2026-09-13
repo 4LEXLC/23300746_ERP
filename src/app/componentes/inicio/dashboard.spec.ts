@@ -1,5 +1,6 @@
 // Pruebas de: Resumen inicial y accesos a los módulos.
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Dashboard } from './dashboard';
 
@@ -9,7 +10,7 @@ describe('Dashboard', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
       imports: [Dashboard],
     }).compileComponents();
 

@@ -9,7 +9,6 @@
         <th>Salario</th>
         <th>Horario</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -28,17 +27,6 @@
           <td>
             <span class="badge" [class]="trabajador.estado">
               <span class="dotb"></span>{{ trabajador.estado === 'activo' ? 'Activo' : 'Baja' }}
-            </span>
-          </td>
-          <td>
-            <span class="actions-cell">
-              @if (trabajador.estado === 'activo') {
-                <button type="button" class="estado-btn" (click)="registrarAsistencia.emit(trabajador)">Registrar asistencia</button>
-              }
-              <button type="button" class="estado-btn" (click)="editar.emit(trabajador)">Editar</button>
-              <button type="button" class="estado-btn" (click)="cambiarEstado.emit(trabajador)">
-                {{ trabajador.estado === 'activo' ? 'Dar de baja' : 'Reactivar' }}
-              </button>
             </span>
           </td>
         </tr>

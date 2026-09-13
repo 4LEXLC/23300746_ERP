@@ -24,13 +24,14 @@ export class Login {
       return;
     }
 
-    const sesion = this.authService.iniciarSesion(this.usuario, this.contrasena);
-    if (!sesion) {
-      this.error = 'Usuario o contraseña incorrectos.';
-      return;
-    }
+    this.authService.iniciarSesion(this.usuario, this.contrasena).subscribe((exito) => {
+      if (!exito) {
+        this.error = 'Usuario o contraseña incorrectos.';
+        return;
+      }
 
-    this.error = '';
-    this.router.navigateByUrl(sesion.rol === 'admin' ? '/dashboard' : '/punto-venta');
+      this.error = '';
+      this.router.navigateByUrl('/dashboard');
+    });
   }
 }

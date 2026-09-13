@@ -1,23 +1,45 @@
-// Proveedores, órdenes de compra y recepción de productos.
+// Proveedores, órdenes de compra y recepción de productos contra el backend real.
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { DatosProveedor, FormularioProveedor } from './modales/formulario-proveedor/formulario-proveedor';
 import { DatosOrdenCompra, FormularioOrdenCompra, LineaOrdenCompra } from './modales/formulario-orden-compra/formulario-orden-compra';
 import { InventarioService } from '../compartidos/servicios/inventario.service';
 import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
+import { API_URL } from '../compartidos/servicios/api.config';
 
 interface Proveedor {
+  id_proveedor?: number;
   nombre: string;
   telefono: string;
   correo: string;
 }
 
 interface OrdenCompra {
+  id_compra?: number;
   folio: string;
   fecha: Date;
   proveedor: string;
   items: LineaOrdenCompra[];
   total: number;
+  estado: 'recibida' | 'pendiente';
+}
+
+interface ProveedorBackend {
+  id_proveedor: number;
+  nombre: string;
+  telefono: string | null;
+  correo: string | null;
+  direccion: string | null;
+  estado: string;
+}
+
+interface CompraBackend {
+  id_compra: number;
+  id_proveedor: number;
+  fecha: string;
+  productos: LineaOrdenCompra[] | string;
+  total: string | number;
   estado: 'recibida' | 'pendiente';
 }
 
@@ -28,75 +50,101 @@ interface OrdenCompra {
   templateUrl: './compra-proveedores.html',
 })
 export class CompraProveedores {
-  constructor(private inventarioService: InventarioService, private contabilidadService: ContabilidadService) {}
+  private readonly urlProveedor = `${API_URL}/proveedor`;
+  private readonly urlCompra = `${API_URL}/compra`;
 
-  proveedores: Proveedor[] = [
-    { nombre: 'Café Origen S.A. de C.V.', telefono: '555-201-3344', correo: 'ventas@cafeorigen.mx' },
-    { nombre: 'Distribuidora Láctea del Bajío', telefono: '555-118-2290', correo: 'pedidos@lacteosbajio.mx' },
-    { nombre: 'Panificadora El Trigal', telefono: '555-330-7712', correo: 'contacto@eltrigal.mx' },
-    { nombre: 'Empaques y Desechables MX', telefono: '555-402-9981', correo: 'ventas@empaquesmx.com' },
-  ];
+  constructor(
+    private http: HttpClient,
+    private inventarioService: InventarioService,
+    private contabilidadService: ContabilidadService,
+  ) {
+    this.cargarProveedores();
+  }
 
-  ordenes: OrdenCompra[] = [
-    {
-      folio: 'OC-0001',
-      fecha: new Date('2026-08-28'),
-      proveedor: 'Café Origen S.A. de C.V.',
-      items: [
-        { nombre: 'Café americano', cantidad: 50, precioUnitario: 19.2 },
-        { nombre: 'Capuchino', cantidad: 40, precioUnitario: 25.2 },
-      ],
-      total: 4250,
-      estado: 'recibida',
-    },
-    {
-      folio: 'OC-0002',
-      fecha: new Date('2026-09-02'),
-      proveedor: 'Distribuidora Láctea del Bajío',
-      items: [{ nombre: 'Latte', cantidad: 30, precioUnitario: 24 }],
-      total: 1860,
-      estado: 'pendiente',
-    },
-  ];
+  proveedores: Proveedor[] = [];
+  ordenes: OrdenCompra[] = [];
 
   mostrarFormularioProveedor = false;
   mostrarFormularioOrden = false;
+
+  private cargarProveedores(): void {
+    this.http.get<ProveedorBackend[]>(this.urlProveedor).subscribe((datos) => {
+      this.proveedores = datos.map((p) => ({ id_proveedor: p.id_proveedor, nombre: p.nombre, telefono: p.telefono ?? '—', correo: p.correo ?? '—' }));
+      this.cargarOrdenes();
+    });
+  }
+
+  private cargarOrdenes(): void {
+    this.http.get<CompraBackend[]>(this.urlCompra).subscribe((datos) => {
+      this.ordenes = datos.map((c) => this.ordenDesdeBackend(c));
+    });
+  }
+
+  private ordenDesdeBackend(c: CompraBackend): OrdenCompra {
+    const proveedor = this.proveedores.find((p) => p.id_proveedor === c.id_proveedor);
+    const items = typeof c.productos === 'string' ? JSON.parse(c.productos) : c.productos;
+    return {
+      id_compra: c.id_compra,
+      folio: `OC-${String(c.id_compra).padStart(4, '0')}`,
+      fecha: new Date(c.fecha),
+      proveedor: proveedor?.nombre ?? '—',
+      items: items ?? [],
+      total: Number(c.total),
+      estado: c.estado,
+    };
+  }
 
   // Obtiene los nombres para el selector de proveedores.
   get nombresProveedores(): string[] {
     return this.proveedores.map((p) => p.nombre);
   }
 
-  // Guarda el proveedor y cierra el formulario.
+  // Guarda el proveedor en el backend y cierra el formulario.
   agregarProveedor(datos: DatosProveedor): void {
-    this.proveedores.push({
-      nombre: datos.nombre,
-      telefono: datos.telefono || '—',
-      correo: datos.correo || '—',
-    });
+    this.http
+      .post<ProveedorBackend>(this.urlProveedor, {
+        nombre: datos.nombre,
+        telefono: datos.telefono || null,
+        correo: datos.correo || null,
+        direccion: null,
+        estado: 'activo',
+      })
+      .subscribe((creado) => {
+        this.proveedores = [...this.proveedores, { id_proveedor: creado.id_proveedor, nombre: creado.nombre, telefono: creado.telefono ?? '—', correo: creado.correo ?? '—' }];
+      });
     this.mostrarFormularioProveedor = false;
   }
 
-  // Calcula el total y guarda la orden de compra.
+  // Calcula el total y guarda la orden de compra en el backend.
   agregarOrdenCompra(datos: DatosOrdenCompra): void {
-    const consecutivo = (this.ordenes.length + 1).toString().padStart(4, '0');
+    const proveedor = this.proveedores.find((p) => p.nombre === datos.proveedor);
+    if (!proveedor?.id_proveedor) return;
     const total = datos.items.reduce((suma, item) => suma + item.cantidad * item.precioUnitario, 0);
-    this.ordenes.push({
-      folio: `OC-${consecutivo}`,
-      fecha: datos.fecha ? new Date(datos.fecha) : new Date(),
-      proveedor: datos.proveedor,
-      items: datos.items,
-      total,
-      estado: datos.estado,
-    });
+
+    this.http
+      .post<CompraBackend>(this.urlCompra, {
+        id_proveedor: proveedor.id_proveedor,
+        productos: datos.items,
+        total,
+        estado: datos.estado,
+      })
+      .subscribe((creada) => {
+        this.ordenes = [this.ordenDesdeBackend(creada), ...this.ordenes];
+      });
     this.mostrarFormularioOrden = false;
   }
 
   // Recibe la compra una sola vez y registra inventario y egreso.
   marcarRecibida(orden: OrdenCompra): void {
-    if (orden.estado === 'recibida') return;
+    if (orden.estado === 'recibida' || !orden.id_compra) return;
     orden.estado = 'recibida';
+    this.http.put(`${this.urlCompra}/${orden.id_compra}`, {
+      id_proveedor: this.proveedores.find((p) => p.nombre === orden.proveedor)?.id_proveedor,
+      productos: orden.items,
+      total: orden.total,
+      estado: 'recibida',
+    }).subscribe();
     this.inventarioService.registrarEntradaPorCompra(orden.items, orden.proveedor);
-    this.contabilidadService.registrarEgreso(`Compra a ${orden.proveedor} (${orden.folio})`, orden.total, 'Insumos y proveedores');
+    this.contabilidadService.registrarEgreso(`Compra a ${orden.proveedor} (${orden.folio})`, orden.total, 'Insumos y proveedores', orden.id_compra);
   }
 }

@@ -66,6 +66,6 @@
 @if (mostrarFormularioCliente) {
   <app-formulario-cliente
     (cerrar)="mostrarFormularioCliente = false"
-    (guardar)="guardarFacturacion()"
+    (guardar)="guardarFacturacion($event)"
   />
 }

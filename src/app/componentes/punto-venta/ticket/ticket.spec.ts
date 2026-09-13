@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';
 import { VentasService } from '../../compartidos/servicios/ventas.service';
 import { Router, provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Ticket } from './ticket';
 
@@ -11,7 +12,7 @@ describe('Ticket', () => {
   it('should render the ticket preview', async () => {
     await TestBed.configureTestingModule({
       imports: [Ticket],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
     }).compileComponents();
     const fixture = TestBed.createComponent(Ticket);
     await fixture.whenStable();

@@ -1,5 +1,6 @@
 // Pruebas de: Historial de ventas y gestión de facturas.
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VentasFacturacion } from './ventas-facturacion';
 
@@ -9,7 +10,7 @@ describe('VentasFacturacion', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
       imports: [VentasFacturacion],
     }).compileComponents();
 

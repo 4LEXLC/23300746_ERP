@@ -54,12 +54,12 @@ export class VentasFacturacion {
     const venta = this.ventaEnFactura;
     if (!venta) return;
 
-    const folio = this.ventasService.generarFactura(venta);
-
-    this.ultimaFactura = folio;
-    this.totalFacturado = venta.total;
-    this.ivaFacturado = venta.total - venta.total / 1.16;
-    this.subtotalFacturado = venta.total - this.ivaFacturado;
+    this.ventasService.generarFactura(venta, datos).subscribe((facturada) => {
+      this.ultimaFactura = facturada.folioFactura ?? '';
+      this.totalFacturado = venta.total;
+      this.ivaFacturado = venta.total - venta.total / 1.16;
+      this.subtotalFacturado = venta.total - this.ivaFacturado;
+    });
 
     this.ventaEnFactura = null;
     this.mostrarFormularioCliente = false;

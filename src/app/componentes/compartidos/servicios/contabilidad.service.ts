@@ -1,14 +1,19 @@
-// Movimientos contables y cálculos del resumen financiero.
+// Movimientos contables reales (tabla movimiento_financiero) y cálculos del resumen financiero.
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from './api.config';
 
 export type CategoriaEgreso = 'Insumos y proveedores' | 'Nómina' | 'Servicios y renta';
 
 export interface MovimientoContable {
+  id_movimiento_financiero?: number;
   fecha: string;
   concepto: string;
   tipo: 'ingreso' | 'egreso';
   monto: number;
   categoria?: CategoriaEgreso;
+  id_venta?: number;
+  id_compra?: number;
 }
 
 const COLORES_CATEGORIA: Record<CategoriaEgreso, string> = {
@@ -17,29 +22,81 @@ const COLORES_CATEGORIA: Record<CategoriaEgreso, string> = {
   'Servicios y renta': '#1baf7a',
 };
 
+// La tabla movimiento_financiero no tiene columna "categoria", así que se codifica
+// dentro de "concepto" como "[Categoría] texto" y se separa al leerla.
+function codificarConcepto(concepto: string, categoria?: CategoriaEgreso): string {
+  return categoria ? `[${categoria}] ${concepto}` : concepto;
+}
+
+function decodificarConcepto(concepto: string): { concepto: string; categoria?: CategoriaEgreso } {
+  const coincidencia = concepto.match(/^\[(.+?)\]\s*(.*)$/);
+  if (!coincidencia) return { concepto };
+  const categoria = coincidencia[1] as CategoriaEgreso;
+  if (!(categoria in COLORES_CATEGORIA)) return { concepto };
+  return { concepto: coincidencia[2], categoria };
+}
+
+interface MovimientoBackend {
+  id_movimiento_financiero: number;
+  id_venta: number | null;
+  id_compra: number | null;
+  tipo: 'ingreso' | 'egreso';
+  concepto: string;
+  monto: string | number;
+  fecha: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ContabilidadService {
-  movimientos: MovimientoContable[] = [
-    { fecha: '2026-09-01', concepto: 'Servicios y renta del local', tipo: 'egreso', monto: 3783, categoria: 'Servicios y renta' },
-    { fecha: '2026-09-01', concepto: 'Nómina quincenal', tipo: 'egreso', monto: 9312, categoria: 'Nómina' },
-    { fecha: '2026-09-03', concepto: 'Venta del día', tipo: 'ingreso', monto: 2980 },
-    { fecha: '2026-09-04', concepto: 'Pago a Café Origen S.A. de C.V.', tipo: 'egreso', monto: 4250, categoria: 'Insumos y proveedores' },
-    { fecha: '2026-09-05', concepto: 'Venta del día', tipo: 'ingreso', monto: 3450 },
-  ];
+  private readonly apiUrl = `${API_URL}/movimiento_financiero`;
+
+  movimientos: MovimientoContable[] = [];
+
+  constructor(private http: HttpClient) {
+    this.cargarMovimientos();
+  }
+
+  private cargarMovimientos(): void {
+    this.http.get<MovimientoBackend[]>(this.apiUrl).subscribe((datos) => {
+      this.movimientos = datos.map((m) => this.aFrontend(m));
+    });
+  }
+
+  private aFrontend(m: MovimientoBackend): MovimientoContable {
+    const { concepto, categoria } = decodificarConcepto(m.concepto);
+    return {
+      id_movimiento_financiero: m.id_movimiento_financiero,
+      fecha: (m.fecha ?? '').toString().slice(0, 10),
+      concepto,
+      tipo: m.tipo,
+      monto: Number(m.monto),
+      categoria,
+      id_venta: m.id_venta ?? undefined,
+      id_compra: m.id_compra ?? undefined,
+    };
+  }
 
   // Agrega un ingreso con la fecha actual.
-  registrarIngreso(concepto: string, monto: number): void {
-    this.movimientos = [{ fecha: this.hoy(), concepto, tipo: 'ingreso', monto }, ...this.movimientos];
+  registrarIngreso(concepto: string, monto: number, id_venta?: number): void {
+    this.http
+      .post<MovimientoBackend>(this.apiUrl, { tipo: 'ingreso', concepto, monto, id_venta })
+      .subscribe((creado) => {
+        this.movimientos = [this.aFrontend(creado), ...this.movimientos];
+      });
   }
 
   // Agrega un egreso con su categoría.
-  registrarEgreso(concepto: string, monto: number, categoria: CategoriaEgreso): void {
-    this.movimientos = [{ fecha: this.hoy(), concepto, tipo: 'egreso', monto, categoria }, ...this.movimientos];
-  }
-
-  // Obtiene la fecha UTC en formato año-mes-día.
-  private hoy(): string {
-    return new Date().toISOString().slice(0, 10);
+  registrarEgreso(concepto: string, monto: number, categoria: CategoriaEgreso, id_compra?: number): void {
+    this.http
+      .post<MovimientoBackend>(this.apiUrl, {
+        tipo: 'egreso',
+        concepto: codificarConcepto(concepto, categoria),
+        monto,
+        id_compra,
+      })
+      .subscribe((creado) => {
+        this.movimientos = [this.aFrontend(creado), ...this.movimientos];
+      });
   }
 
   // Suma los movimientos de ingreso.

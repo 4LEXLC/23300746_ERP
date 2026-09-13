@@ -1,5 +1,6 @@
 // Pruebas de: Resumen de ingresos, egresos y reportes.
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Contabilidad } from './contabilidad';
 
@@ -9,7 +10,7 @@ describe('Contabilidad', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
       imports: [Contabilidad],
     }).compileComponents();
 

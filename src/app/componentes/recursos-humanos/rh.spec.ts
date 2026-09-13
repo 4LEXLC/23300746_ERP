@@ -1,5 +1,6 @@
 // Pruebas de: Trabajadores, asistencias, permisos y nómina.
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RH } from './rh';
 
@@ -9,7 +10,7 @@ describe('RH', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
       imports: [RH],
     }).compileComponents();
 

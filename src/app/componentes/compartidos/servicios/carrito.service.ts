@@ -1,5 +1,6 @@
 // Pedido compartido, reserva de existencia y registro del pago.
 import { Injectable } from '@angular/core';
+import { Observable, map, of, tap } from 'rxjs';
 import { Producto } from '../../punto-venta/componentes/producto-card/producto-card';
 import { ItemCarrito } from '../../punto-venta/componentes/carrito-item/carrito-item';
 import { InventarioService } from './inventario.service';
@@ -102,16 +103,20 @@ export class CarritoService {
     this.ventaConfirmada = false;
   }
 
-  /** Registra la venta y su ingreso; el pago es simulado. */
-  procesarPago(): boolean {
-    if (!this.ventaConfirmada) return false;
+  /** Registra la venta en el backend y su ingreso; el pago es simulado. */
+  procesarPago(): Observable<boolean> {
+    if (!this.ventaConfirmada) return of(false);
 
     const metodoEtiqueta = this.metodoPago === 'efectivo' ? 'Efectivo' : 'Tarjeta';
-    const venta = this.ventasService.registrarVenta(this.cantidadTotal, this.total, metodoEtiqueta, this.solicitaFactura);
-    this.contabilidadService.registrarIngreso(`Venta ${venta.folio}`, this.total);
+    const items = this.items.map((i) => ({ nombre: i.producto.nombre, cantidad: i.cantidad, precioUnitario: i.producto.precio }));
 
-    this.ultimoFolio = venta.folio;
-    return true;
+    return this.ventasService.registrarVenta(items, this.subtotal, this.iva, this.total, metodoEtiqueta).pipe(
+      tap((venta) => {
+        this.contabilidadService.registrarIngreso(`Venta ${venta.folio}`, this.total, venta.id_venta);
+        this.ultimoFolio = venta.folio;
+      }),
+      map(() => true),
+    );
   }
 
   // Reinicia el pedido y sus datos de pago.

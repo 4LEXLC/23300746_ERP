@@ -42,11 +42,8 @@
                         <span class="link-btn">Ver factura</span><p class="muted">{{ venta.folioFactura }}</p>
                         <button type="button" class="link-btn muted2" (click)="cancelarFactura(venta)">Cancelar factura</button>
                       }
-                      @case ('pendiente') {
-                        <button type="button" class="link-btn" (click)="facturar(venta)">Facturar</button>
-                      }
                       @default {
-                        <span class="link-btn muted2">Sin facturar</span>
+                        <button type="button" class="link-btn" (click)="facturar(venta)">Facturar</button>
                       }
                     }
                   </td>

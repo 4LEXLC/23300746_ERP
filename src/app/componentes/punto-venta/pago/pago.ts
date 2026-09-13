@@ -40,9 +40,10 @@ export class Pago {
     this.procesandoPago = true;
 
     setTimeout(() => {
-      this.carritoService.procesarPago();
-      this.procesandoPago = false;
-      this.router.navigateByUrl('/ticket');
+      this.carritoService.procesarPago().subscribe(() => {
+        this.procesandoPago = false;
+        this.router.navigateByUrl('/ticket');
+      });
     }, 900);
   }
 }
