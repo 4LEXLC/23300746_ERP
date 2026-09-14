@@ -1,3 +1,4 @@
+// CRUD de asistencia: registros de entrada/salida de cada trabajador.
 const conexion = require('../../config/db');
 const Asistencia = require('../models/asistencia.model');
 

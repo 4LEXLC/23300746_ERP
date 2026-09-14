@@ -1,3 +1,4 @@
+// CRUD de movimiento_inventario: entradas y salidas de stock de cada producto.
 const conexion = require('../../config/db');
 const MovimientoInventario = require('../models/movimiento_inventario.model');
 

@@ -1,3 +1,4 @@
+// CRUD de ticket: ticket/comprobante impreso de una venta.
 const conexion = require('../../config/db');
 const Ticket = require('../models/ticket.model');
 

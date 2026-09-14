@@ -1,3 +1,4 @@
+// CRUD de usuario: usuarios que inician sesión en el sistema.
 const conexion = require('../../config/db');
 const Usuario = require('../models/usuario.model');
 

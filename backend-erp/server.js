@@ -1,5 +1,7 @@
+// Servidor del backend: conecta el frontend de Angular con la base de datos MySQL.
+// Aquí se registran todas las rutas del API (una por cada tabla del negocio).
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // permite que Angular (otro puerto) pueda hacer peticiones a este servidor
 const productoRoutes = require('./routes/producto.routes');
 const usuarioRoutes = require('./routes/usuario.routes');
 const puestoRoutes = require('./routes/puesto.routes');
@@ -21,7 +23,9 @@ const movimientoFinancieroRoutes = require('./routes/movimiento_financiero.route
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // permite leer el body de las peticiones en formato JSON
+
+// Cada línea conecta una URL (ej. /api/venta) con su archivo de rutas.
 app.use('/api/producto', productoRoutes);
 app.use('/api/usuario', usuarioRoutes);
 app.use('/api/puesto', puestoRoutes);

@@ -1,3 +1,4 @@
+// CRUD de horario: horario de trabajo de cada trabajador.
 const conexion = require('../../config/db');
 const Horario = require('../models/horario.model');
 

@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para movimiento_financiero.
 const express = require('express');
 const {
   obtenerMovimientoFinancieros,

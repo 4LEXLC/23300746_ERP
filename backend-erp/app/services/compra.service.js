@@ -1,3 +1,4 @@
+// CRUD de compra: compras de café/producto ya preparado a los proveedores.
 const conexion = require('../../config/db');
 const Compra = require('../models/compra.model');
 

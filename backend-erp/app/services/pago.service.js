@@ -1,3 +1,4 @@
+// CRUD de pago: pago asociado a cada venta.
 const conexion = require('../../config/db');
 const Pago = require('../models/pago.model');
 

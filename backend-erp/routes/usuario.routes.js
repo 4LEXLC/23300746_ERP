@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para usuario.
 const express = require('express');
 const {
   obtenerUsuarios,

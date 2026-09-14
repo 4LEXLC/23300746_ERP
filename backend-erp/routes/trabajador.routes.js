@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para trabajador.
 const express = require('express');
 const {
   obtenerTrabajadors,

@@ -1,3 +1,4 @@
+// CRUD de permiso: solicitudes de permisos/vacaciones de trabajadores.
 const conexion = require('../../config/db');
 const Permiso = require('../models/permiso.model');
 

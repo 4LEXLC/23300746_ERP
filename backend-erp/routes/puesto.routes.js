@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para puesto.
 const express = require('express');
 const {
   obtenerPuestos,

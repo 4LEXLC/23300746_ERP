@@ -9,6 +9,11 @@ const {
 
 const router = express.Router();
 
+// GET  /api/venta      -> lista todas las ventas
+// GET  /api/venta/:id  -> una venta en específico
+// POST /api/venta      -> crea una venta nueva (la usa el punto de venta al cobrar)
+// PUT  /api/venta/:id  -> edita una venta
+// DELETE /api/venta/:id -> elimina una venta
 router.get('/', async (req, res) => {
   try {
     res.json(await obtenerVentas());

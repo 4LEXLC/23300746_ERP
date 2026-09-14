@@ -1,3 +1,4 @@
+// CRUD de movimiento_financiero: ingresos (ventas) y egresos (compras) para contabilidad.
 const conexion = require('../../config/db');
 const MovimientoFinanciero = require('../models/movimiento_financiero.model');
 

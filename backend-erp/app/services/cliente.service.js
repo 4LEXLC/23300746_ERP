@@ -1,3 +1,4 @@
+// CRUD de cliente: clientes a los que se les factura una venta.
 const conexion = require('../../config/db');
 const Cliente = require('../models/cliente.model');
 

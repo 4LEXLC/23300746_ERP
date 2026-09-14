@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para factura.
 const express = require('express');
 const {
   obtenerFacturas,

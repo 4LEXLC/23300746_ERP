@@ -1,3 +1,4 @@
+// CRUD de proveedor: proveedores que entregan el producto ya preparado.
 const conexion = require('../../config/db');
 const Proveedor = require('../models/proveedor.model');
 

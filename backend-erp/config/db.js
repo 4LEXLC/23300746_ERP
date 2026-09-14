@@ -1,3 +1,5 @@
+// Configuración de la conexión a MySQL (base de datos cafeteriaerp).
+// Todos los servicios (venta, producto, trabajador, etc.) usan esta misma conexión.
 const mysql = require('mysql2');
 
 const conexion = mysql.createConnection({

@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para pago.
 const express = require('express');
 const {
   obtenerPagos,

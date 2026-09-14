@@ -1,3 +1,4 @@
+// CRUD de producto: productos (bebidas y repostería) que se venden.
 const conexion = require('../../config/db');
 const Producto = require('../models/producto.model');
 

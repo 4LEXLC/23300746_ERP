@@ -1,3 +1,4 @@
+// CRUD de producto_proveedor: qué proveedor surte cada producto y a qué precio.
 const conexion = require('../../config/db');
 const ProductoProveedor = require('../models/producto_proveedor.model');
 

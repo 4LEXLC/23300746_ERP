@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para asistencia.
 const express = require('express');
 const {
   obtenerAsistencias,

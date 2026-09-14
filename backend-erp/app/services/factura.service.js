@@ -1,3 +1,4 @@
+// CRUD de factura: facturas generadas sobre una venta.
 const conexion = require('../../config/db');
 const Factura = require('../models/factura.model');
 

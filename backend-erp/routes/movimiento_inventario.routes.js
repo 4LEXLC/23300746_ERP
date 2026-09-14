@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para movimiento_inventario.
 const express = require('express');
 const {
   obtenerMovimientoInventarios,

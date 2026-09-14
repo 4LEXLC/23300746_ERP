@@ -1,3 +1,4 @@
+// CRUD de trabajador: trabajadores de la cafetería.
 const conexion = require('../../config/db');
 const Trabajador = require('../models/trabajador.model');
 

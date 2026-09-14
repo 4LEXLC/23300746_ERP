@@ -2,18 +2,10 @@
 <header class="page-head">
   <hgroup>
     <h1>Recursos Humanos</h1>
-    <p>{{ activos }} trabajadores activos · {{ bajas }} baja(s) · {{ permisosPendientes }} permiso(s) pendiente(s)</p>
+    <p>{{ activos }} trabajadores activos · {{ bajas }} baja(s)</p>
   </hgroup>
 </header>
 
 <section class="layout">
   <app-tabla-trabajadores [trabajadores]="trabajadores" />
-
-  <section>
-    <app-lista-asistencias [asistencias]="asistencias" />
-
-    <app-lista-permisos [permisos]="permisos" />
-  </section>
 </section>
-
-<app-tabla-nomina [pagos]="pagos" [trabajadoresConPagoPendiente]="trabajadoresConPagoPendiente" />

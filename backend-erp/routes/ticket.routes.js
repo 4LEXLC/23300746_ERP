@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para ticket.
 const express = require('express');
 const {
   obtenerTickets,

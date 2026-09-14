@@ -1,7 +1,13 @@
+// CRUD de ventas: aquí se guarda cada venta que se hace en el punto de venta.
 const conexion = require('../../config/db');
 const Venta = require('../models/venta.model');
 
 const COLUMNAS = 'id_venta, id_trabajador, fecha, productos, subtotal, iva, total, estado';
+
+// obtenerVentas/obtenerVentaPorId = Read
+// crearVenta = Create
+// actualizarVenta = Update
+// eliminarVenta = Delete
 
 function mapFila(fila) {
   return new Venta(fila.id_venta, fila.id_trabajador, fila.fecha, fila.productos, fila.subtotal, fila.iva, fila.total, fila.estado);

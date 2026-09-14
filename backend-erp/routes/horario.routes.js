@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para horario.
 const express = require('express');
 const {
   obtenerHorarios,

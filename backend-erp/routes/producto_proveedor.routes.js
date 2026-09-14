@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para producto_proveedor.
 const express = require('express');
 const {
   obtenerProductoProveedors,

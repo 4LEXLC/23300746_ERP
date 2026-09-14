@@ -1,3 +1,4 @@
+// CRUD de puesto: puestos de trabajo (cajero, barista, etc.).
 const conexion = require('../../config/db');
 const Puesto = require('../models/puesto.model');
 

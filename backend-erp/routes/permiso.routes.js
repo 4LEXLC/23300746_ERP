@@ -1,3 +1,4 @@
+// Rutas HTTP (GET/POST/PUT/DELETE) para permiso.
 const express = require('express');
 const {
   obtenerPermisos,
