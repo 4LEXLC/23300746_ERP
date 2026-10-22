@@ -4,8 +4,19 @@
     <h1>Recursos Humanos</h1>
     <p>{{ activos }} trabajadores activos · {{ bajas }} baja(s)</p>
   </hgroup>
+  <button type="button" class="add-btn" (click)="mostrarFormularioPago = true">Pagar nómina</button>
 </header>
 
 <section class="layout">
-  <app-tabla-trabajadores [trabajadores]="trabajadores" />
+  <app-tabla-trabajadores [trabajadores]="trabajadores()" />
+  <app-tabla-nomina [pagos]="pagosNomina" />
 </section>
+
+@if (mostrarFormularioPago) {
+  <app-formulario-pago-salario
+    [trabajadores]="nombresActivos"
+    [salarios]="salarios"
+    (cerrar)="mostrarFormularioPago = false"
+    (guardar)="registrarPago($event)"
+  />
+}

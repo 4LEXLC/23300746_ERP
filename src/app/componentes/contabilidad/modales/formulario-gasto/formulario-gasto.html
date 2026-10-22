@@ -1,0 +1,35 @@
+<!-- Captura de gastos de servicios y renta. -->
+<aside class="overlay" (click)="cerrar.emit()">
+  <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
+  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Registrar gasto</h3>
+        <p>Servicios y renta: luz, agua, internet, renta del local, etc.</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <section class="field">
+        <label for="g-concepto">Concepto <span class="req">*</span></label>
+        <input id="g-concepto" class="box" type="text" name="concepto" placeholder="Ej. Renta de octubre" [(ngModel)]="datos.concepto" required />
+      </section>
+
+      <section class="field">
+        <label for="g-monto">Monto <span class="req">*</span></label>
+        <input id="g-monto" class="box" type="number" min="0.01" step="0.01" name="monto" [(ngModel)]="datos.monto" required />
+      </section>
+    </section>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn-pri">
+        Registrar gasto
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </button>
+    </footer>
+  </form>
+</aside>

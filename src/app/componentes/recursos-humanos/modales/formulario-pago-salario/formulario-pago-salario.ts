@@ -19,6 +19,7 @@ export interface DatosPagoSalario {
 export class FormularioPagoSalario {
   // Recibe datos del componente padre o le comunica acciones.
   @Input() trabajadores: string[] = [];
+  @Input() salarios: Record<string, number> = {};
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosPagoSalario>();
 
@@ -30,8 +31,13 @@ export class FormularioPagoSalario {
     fechaPago: '',
   };
 
+  // Sugiere el salario del trabajador elegido.
+  alElegirTrabajador(nombre: string): void {
+    this.datos.monto = this.salarios[nombre] ?? 0;
+  }
+
   // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
-    this.guardar.emit(this.datos);
+    this.guardar.emit({ ...this.datos });
   }
 }

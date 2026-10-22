@@ -1,11 +1,12 @@
 // Historial de ventas y gestión de facturas.
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DatosCliente, FormularioCliente } from '../compartidos/modales/formulario-cliente/formulario-cliente';
 import { Venta, VentasService } from '../compartidos/servicios/ventas.service';
 
 @Component({
-  imports: [DatePipe, FormularioCliente],
+  imports: [DatePipe, FormsModule, FormularioCliente],
   selector: 'app-ventas-facturacion',
   styleUrl: './ventas-facturacion.css',
   templateUrl: './ventas-facturacion.html',
@@ -14,26 +15,42 @@ export class VentasFacturacion {
   constructor(public ventasService: VentasService) {}
 
   pestanaActiva: 'ventas' | 'facturas' = 'ventas';
+  diasPeriodo = 7;
+  periodos = [
+    { dias: 1, etiqueta: 'Hoy' },
+    { dias: 7, etiqueta: 'Últimos 7 días' },
+    { dias: 30, etiqueta: 'Últimos 30 días' },
+    { dias: 0, etiqueta: 'Todas' },
+  ];
   hoy = new Date();
 
   // Obtiene el historial de ventas.
   get ventas(): Venta[] {
-    return this.ventasService.ventas;
+    return this.ventasService.ventas();
   }
 
-  // Muestra las ventas según la pestaña activa.
+  // Ventas dentro del periodo elegido (0 = todas).
+  get ventasPeriodo(): Venta[] {
+    if (!this.diasPeriodo) return this.ventas;
+    const limite = new Date();
+    limite.setHours(0, 0, 0, 0);
+    limite.setDate(limite.getDate() - (this.diasPeriodo - 1));
+    return this.ventas.filter((v) => v.fecha >= limite);
+  }
+
+  // Muestra las ventas según la pestaña activa y el periodo.
   get ventasMostradas(): Venta[] {
-    return this.pestanaActiva === 'facturas' ? this.ventas.filter((v) => v.factura === 'emitida') : this.ventas;
+    return this.pestanaActiva === 'facturas' ? this.ventasPeriodo.filter((v) => v.factura === 'emitida') : this.ventasPeriodo;
   }
 
-  // Obtiene la cantidad de ventas registradas.
+  // Obtiene la cantidad de ventas del periodo.
   get totalVentas(): number {
-    return this.ventasService.totalVentas;
+    return this.ventasPeriodo.length;
   }
 
-  // Cuenta las ventas con factura emitida.
+  // Cuenta las ventas con factura emitida del periodo.
   get totalFacturadas(): number {
-    return this.ventasService.totalFacturadas;
+    return this.ventasPeriodo.filter((v) => v.factura === 'emitida').length;
   }
 
   mostrarFormularioCliente = false;

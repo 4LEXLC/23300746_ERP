@@ -1,5 +1,5 @@
 // Productos y movimientos de inventario contra el backend real (tabla producto / movimiento_inventario).
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_URL } from './api.config';
 
@@ -40,9 +40,9 @@ interface ProductoBackend {
 export class InventarioService {
   private readonly apiUrl = `${API_URL}/producto`;
 
-  productos: ProductoInventario[] = [];
+  productos = signal<ProductoInventario[]>([]);
 
-  movimientos: MovimientoInventario[] = [];
+  movimientos = signal<MovimientoInventario[]>([]);
 
   constructor(private http: HttpClient) {
     this.cargarProductos();
@@ -50,7 +50,7 @@ export class InventarioService {
 
   private cargarProductos(): void {
     this.http.get<ProductoBackend[]>(this.apiUrl).subscribe((datos) => {
-      this.productos = datos.map((p) => this.aFrontend(p));
+      this.productos.set(datos.map((p) => this.aFrontend(p)));
     });
   }
 
@@ -84,22 +84,22 @@ export class InventarioService {
   // Agrega un producto en el backend y lo refleja en la lista local.
   agregarProducto(producto: Omit<ProductoInventario, 'sku'>): void {
     this.http.post<ProductoBackend>(this.apiUrl, this.aBackend(producto)).subscribe((creado) => {
-      this.productos = [...this.productos, this.aFrontend(creado)];
+      this.productos.update((lista) => [...lista, this.aFrontend(creado)]);
     });
   }
 
   // Actualiza el producto que coincide con el SKU.
   editarProducto(sku: string, cambios: Omit<ProductoInventario, 'sku'>): void {
-    const actual = this.productos.find((p) => p.sku === sku);
+    const actual = this.productos().find((p) => p.sku === sku);
     if (!actual?.id_producto) return;
     this.http.put<ProductoBackend>(`${this.apiUrl}/${actual.id_producto}`, this.aBackend(cambios)).subscribe((actualizado) => {
-      this.productos = this.productos.map((p) => (p.sku === sku ? this.aFrontend(actualizado) : p));
+      this.productos.update((lista) => lista.map((p) => (p.sku === sku ? this.aFrontend(actualizado) : p)));
     });
   }
 
   // Cambia entre activo e inactivo.
   alternarEstado(sku: string): void {
-    const actual = this.productos.find((p) => p.sku === sku);
+    const actual = this.productos().find((p) => p.sku === sku);
     if (!actual) return;
     this.editarProducto(sku, { ...actual, estado: actual.estado === 'activo' ? 'inactivo' : 'activo' });
   }
@@ -118,41 +118,44 @@ export class InventarioService {
 
   // Consulta las unidades disponibles.
   existenciaDe(nombre: string): number {
-    return this.productos.find((p) => p.nombre === nombre)?.existencia ?? 0;
+    return this.productos().find((p) => p.nombre === nombre)?.existencia ?? 0;
   }
 
   // Descuenta las unidades vendidas, actualiza el backend y registra la salida.
   registrarVenta(nombre: string, cantidad: number): void {
-    const producto = this.productos.find((p) => p.nombre === nombre);
+    const producto = this.productos().find((p) => p.nombre === nombre);
     if (!producto) return;
     producto.existencia = Math.max(0, producto.existencia - cantidad);
+    this.productos.update((lista) => [...lista]);
     this.persistirMovimiento(producto, 'salida', cantidad, 'Venta registrada');
-    this.movimientos = [
+    this.movimientos.update((lista) => [
       { producto: nombre, tipo: 'salida', cantidad, motivo: 'Venta registrada', fecha: new Date() },
-      ...this.movimientos,
-    ];
+      ...lista,
+    ]);
   }
 
   // Devuelve al inventario las unidades reservadas.
   liberarReserva(nombre: string, cantidad: number): void {
-    const producto = this.productos.find((p) => p.nombre === nombre);
+    const producto = this.productos().find((p) => p.nombre === nombre);
     if (!producto) return;
     producto.existencia += cantidad;
+    this.productos.update((lista) => [...lista]);
     this.persistirStock(producto);
   }
 
   // Suma las unidades recibidas, actualiza el backend y registra sus entradas.
   registrarEntradaPorCompra(items: { nombre: string; cantidad: number }[], proveedor: string): void {
     for (const item of items) {
-      const producto = this.productos.find((p) => p.nombre === item.nombre);
+      const producto = this.productos().find((p) => p.nombre === item.nombre);
       if (producto) {
         producto.existencia += item.cantidad;
+        this.productos.update((lista) => [...lista]);
         this.persistirMovimiento(producto, 'entrada', item.cantidad, `Compra recibida de ${proveedor}`);
       }
-      this.movimientos = [
+      this.movimientos.update((lista) => [
         { producto: item.nombre, tipo: 'entrada', cantidad: item.cantidad, motivo: `Compra recibida de ${proveedor}`, fecha: new Date() },
-        ...this.movimientos,
-      ];
+        ...lista,
+      ]);
     }
   }
 

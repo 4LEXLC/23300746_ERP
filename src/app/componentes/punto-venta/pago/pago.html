@@ -1,4 +1,4 @@
-<!-- Selección del método y simulación del pago. -->
+<!-- Selección del método y pago (efectivo o PayPal). -->
 <header class="topbar">
   <button type="button" class="back" (click)="volverAlPedido()">
     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></span>
@@ -69,15 +69,47 @@
     </section>
 
     <section class="status-card">
-      @if (procesandoPago) {
+      <label class="acepto">
+        <input
+          type="checkbox"
+          [checked]="aceptaTerminos()"
+          (change)="aceptaTerminos.set($any($event.target).checked)"
+        />
+        <span>
+          El cliente acepta los <a routerLink="/terminos">términos y condiciones</a>
+          y el <a routerLink="/aviso-privacidad">aviso de privacidad</a>.
+        </span>
+      </label>
+      @if (procesandoPago()) {
         <p class="gateway-status">Conectando con la pasarela de pago…</p>
       }
-      <button
-        type="button"
-        class="status-cta"
-        [disabled]="!carritoService.items.length || procesandoPago"
-        (click)="procesarPago()"
-      >{{ procesandoPago ? 'Procesando…' : 'Procesar pago' }}</button>
+      @if (mensajePago()) {
+        <p class="gateway-status">{{ mensajePago() }}</p>
+      }
+      @if (carritoService.metodoPago === 'tarjeta') {
+        @if (paypalListo() && carritoService.items.length && aceptaTerminos()) {
+          <paypal-button
+            type="pay"
+            [attr.disabled]="procesandoPago() ? '' : null"
+            (click)="pagarConPaypal()"
+          ></paypal-button>
+        } @else if (paypalListo() && !aceptaTerminos()) {
+          <p class="gateway-status">Acepta los términos para continuar con el pago.</p>
+        } @else if (!mensajePago()) {
+          <p class="gateway-status">Preparando PayPal…</p>
+        }
+      } @else {
+        <button
+          type="button"
+          class="status-cta"
+          [disabled]="!carritoService.items.length || procesandoPago() || !aceptaTerminos()"
+          (click)="procesarPago()"
+        >{{ procesandoPago() ? 'Procesando…' : 'Procesar pago' }}</button>
+      }
     </section>
   </section>
 </main>
+<app-footer class="wrap"/>
+
+
+ 

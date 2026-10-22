@@ -72,6 +72,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 .page-head h1 {
   font-size: 22px;
@@ -84,6 +86,7 @@ button {
 .head-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 .periods {

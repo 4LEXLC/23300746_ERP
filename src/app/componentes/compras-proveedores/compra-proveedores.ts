@@ -1,5 +1,5 @@
 // Proveedores, órdenes de compra y recepción de productos contra el backend real.
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { DatosProveedor, FormularioProveedor } from './modales/formulario-proveedor/formulario-proveedor';
@@ -61,27 +61,27 @@ export class CompraProveedores {
     this.cargarProveedores();
   }
 
-  proveedores: Proveedor[] = [];
-  ordenes: OrdenCompra[] = [];
+  proveedores = signal<Proveedor[]>([]);
+  ordenes = signal<OrdenCompra[]>([]);
 
   mostrarFormularioProveedor = false;
   mostrarFormularioOrden = false;
 
   private cargarProveedores(): void {
     this.http.get<ProveedorBackend[]>(this.urlProveedor).subscribe((datos) => {
-      this.proveedores = datos.map((p) => ({ id_proveedor: p.id_proveedor, nombre: p.nombre, telefono: p.telefono ?? '—', correo: p.correo ?? '—' }));
+      this.proveedores.set(datos.map((p) => ({ id_proveedor: p.id_proveedor, nombre: p.nombre, telefono: p.telefono ?? '—', correo: p.correo ?? '—' })));
       this.cargarOrdenes();
     });
   }
 
   private cargarOrdenes(): void {
     this.http.get<CompraBackend[]>(this.urlCompra).subscribe((datos) => {
-      this.ordenes = datos.map((c) => this.ordenDesdeBackend(c));
+      this.ordenes.set(datos.map((c) => this.ordenDesdeBackend(c)));
     });
   }
 
   private ordenDesdeBackend(c: CompraBackend): OrdenCompra {
-    const proveedor = this.proveedores.find((p) => p.id_proveedor === c.id_proveedor);
+    const proveedor = this.proveedores().find((p) => p.id_proveedor === c.id_proveedor);
     const items = typeof c.productos === 'string' ? JSON.parse(c.productos) : c.productos;
     return {
       id_compra: c.id_compra,
@@ -96,7 +96,7 @@ export class CompraProveedores {
 
   // Obtiene los nombres para el selector de proveedores.
   get nombresProveedores(): string[] {
-    return this.proveedores.map((p) => p.nombre);
+    return this.proveedores().map((p) => p.nombre);
   }
 
   // Guarda el proveedor en el backend y cierra el formulario.
@@ -110,14 +110,14 @@ export class CompraProveedores {
         estado: 'activo',
       })
       .subscribe((creado) => {
-        this.proveedores = [...this.proveedores, { id_proveedor: creado.id_proveedor, nombre: creado.nombre, telefono: creado.telefono ?? '—', correo: creado.correo ?? '—' }];
+        this.proveedores.update((lista) => [...lista, { id_proveedor: creado.id_proveedor, nombre: creado.nombre, telefono: creado.telefono ?? '—', correo: creado.correo ?? '—' }]);
       });
     this.mostrarFormularioProveedor = false;
   }
 
   // Calcula el total y guarda la orden de compra en el backend.
   agregarOrdenCompra(datos: DatosOrdenCompra): void {
-    const proveedor = this.proveedores.find((p) => p.nombre === datos.proveedor);
+    const proveedor = this.proveedores().find((p) => p.nombre === datos.proveedor);
     if (!proveedor?.id_proveedor) return;
     const total = datos.items.reduce((suma, item) => suma + item.cantidad * item.precioUnitario, 0);
 
@@ -129,7 +129,7 @@ export class CompraProveedores {
         estado: datos.estado,
       })
       .subscribe((creada) => {
-        this.ordenes = [this.ordenDesdeBackend(creada), ...this.ordenes];
+        this.ordenes.update((lista) => [this.ordenDesdeBackend(creada), ...lista]);
       });
     this.mostrarFormularioOrden = false;
   }
@@ -138,8 +138,9 @@ export class CompraProveedores {
   marcarRecibida(orden: OrdenCompra): void {
     if (orden.estado === 'recibida' || !orden.id_compra) return;
     orden.estado = 'recibida';
+    this.ordenes.update((lista) => [...lista]);
     this.http.put(`${this.urlCompra}/${orden.id_compra}`, {
-      id_proveedor: this.proveedores.find((p) => p.nombre === orden.proveedor)?.id_proveedor,
+      id_proveedor: this.proveedores().find((p) => p.nombre === orden.proveedor)?.id_proveedor,
       productos: orden.items,
       total: orden.total,
       estado: 'recibida',

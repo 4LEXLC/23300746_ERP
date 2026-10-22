@@ -1,5 +1,5 @@
 // Movimientos contables reales (tabla movimiento_financiero) y cálculos del resumen financiero.
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_URL } from './api.config';
 
@@ -50,7 +50,33 @@ interface MovimientoBackend {
 export class ContabilidadService {
   private readonly apiUrl = `${API_URL}/movimiento_financiero`;
 
-  movimientos: MovimientoContable[] = [];
+  movimientos = signal<MovimientoContable[]>([]);
+  rango = signal <{desde: string; hasta: string} | null>(null); //Null= Sin filtro
+
+  movimientosFiltrados = computed(() => {
+    const r = this.rango()
+    const todos = this.movimientos();
+    if(!r) return todos;
+    return todos.filter((m) => (!r.desde || m.fecha >= r.desde) && (!r.hasta || m.fecha <= r.hasta ));
+  })
+
+  //Calcula el rango de fechas
+  establecerPeriodo(periodo: string, desde = '', hasta = ''): void {
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const hoy = new Date();
+  if (periodo === 'Hoy') {
+    this.rango.set({ desde: fmt(hoy), hasta: fmt(hoy) });
+  } else if (periodo === 'Semana') {
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() - 6);
+    this.rango.set({ desde: fmt(inicio), hasta: fmt(hoy) });
+  } else if (periodo === 'Mes') {
+    this.rango.set({ desde: fmt(new Date(hoy.getFullYear(), hoy.getMonth(), 1)), hasta: fmt(hoy) });
+  } else {
+    this.rango.set({ desde, hasta });
+  }
+}
 
   constructor(private http: HttpClient) {
     this.cargarMovimientos();
@@ -58,7 +84,7 @@ export class ContabilidadService {
 
   private cargarMovimientos(): void {
     this.http.get<MovimientoBackend[]>(this.apiUrl).subscribe((datos) => {
-      this.movimientos = datos.map((m) => this.aFrontend(m));
+      this.movimientos.set(datos.map((m) => this.aFrontend(m)));
     });
   }
 
@@ -81,7 +107,7 @@ export class ContabilidadService {
     this.http
       .post<MovimientoBackend>(this.apiUrl, { tipo: 'ingreso', concepto, monto, id_venta })
       .subscribe((creado) => {
-        this.movimientos = [this.aFrontend(creado), ...this.movimientos];
+        this.movimientos.update((lista) => [this.aFrontend(creado), ...lista]);
       });
   }
 
@@ -95,18 +121,18 @@ export class ContabilidadService {
         id_compra,
       })
       .subscribe((creado) => {
-        this.movimientos = [this.aFrontend(creado), ...this.movimientos];
+        this.movimientos.update((lista) => [this.aFrontend(creado), ...lista]);
       });
   }
 
   // Suma los movimientos de ingreso.
   get ingresos(): number {
-    return this.movimientos.filter((m) => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
+    return this.movimientos().filter((m) => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
   }
 
   // Obtiene el total de egresos.
   get egresosTotal(): number {
-    return this.movimientos.filter((m) => m.tipo === 'egreso').reduce((s, m) => s + m.monto, 0);
+    return this.movimientos().filter((m) => m.tipo === 'egreso').reduce((s, m) => s + m.monto, 0);
   }
 
   // Resta los egresos a los ingresos.
@@ -134,7 +160,7 @@ export class ContabilidadService {
     const categorias: CategoriaEgreso[] = ['Insumos y proveedores', 'Nómina', 'Servicios y renta'];
     const total = this.egresosTotal || 1;
     return categorias.map((nombre) => {
-      const monto = this.movimientos
+      const monto = this.movimientos()
         .filter((m) => m.tipo === 'egreso' && m.categoria === nombre)
         .reduce((s, m) => s + m.monto, 0);
       return { nombre, color: COLORES_CATEGORIA[nombre], porcentaje: Math.round((monto / total) * 100), monto };
@@ -151,7 +177,7 @@ export class ContabilidadService {
       const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
       const anio = fecha.getFullYear();
       const mes = fecha.getMonth();
-      const delMes = this.movimientos.filter((m) => {
+      const delMes = this.movimientos().filter((m) => {
         const d = new Date(m.fecha);
         return d.getFullYear() === anio && d.getMonth() === mes;
       });

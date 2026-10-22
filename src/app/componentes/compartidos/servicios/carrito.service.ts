@@ -103,14 +103,14 @@ export class CarritoService {
     this.ventaConfirmada = false;
   }
 
-  /** Registra la venta en el backend y su ingreso; el pago es simulado. */
-  procesarPago(): Observable<boolean> {
+  /** Registra la venta en el backend y su ingreso; en tarjeta guarda la referencia de PayPal. */
+  procesarPago(referencia: string | null = null): Observable<boolean> {
     if (!this.ventaConfirmada) return of(false);
 
     const metodoEtiqueta = this.metodoPago === 'efectivo' ? 'Efectivo' : 'Tarjeta';
     const items = this.items.map((i) => ({ nombre: i.producto.nombre, cantidad: i.cantidad, precioUnitario: i.producto.precio }));
 
-    return this.ventasService.registrarVenta(items, this.subtotal, this.iva, this.total, metodoEtiqueta).pipe(
+    return this.ventasService.registrarVenta(items, this.subtotal, this.iva, this.total, metodoEtiqueta, referencia).pipe(
       tap((venta) => {
         this.contabilidadService.registrarIngreso(`Venta ${venta.folio}`, this.total, venta.id_venta);
         this.ultimoFolio = venta.folio;

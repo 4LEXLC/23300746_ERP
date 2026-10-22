@@ -1,50 +1,79 @@
-// Sesión simple: solo valida usuario y contraseña contra la tabla usuario.
-import { Injectable } from '@angular/core';
+// Sesión con JWT: guarda token, rol y nombre en localStorage.
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';
 import { API_URL } from './api.config';
 
 interface RespuestaLogin {
-  id_usuario: number;
+  token: string;
   nombre_usuario: string;
+  rol: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiUrl = `${API_URL}/usuario`;
+  private readonly http = inject(HttpClient);
+  // En SSR no existe localStorage, por eso se revisa si estamos en el navegador.
+  private readonly esNavegador = isPlatformBrowser(inject(PLATFORM_ID));
 
-  usuarioActual: string | null = null;
-
-  constructor(private http: HttpClient) {}
-
-  // Valida usuario y contraseña contra el backend e inicia la sesión.
+  // Manda las credenciales al backend y guarda la sesión si son correctas.
   iniciarSesion(usuario: string, contrasena: string): Observable<boolean> {
     return this.http
-      .post<RespuestaLogin>(`${this.apiUrl}/login`, {
-        nombre_usuario: usuario.trim(),
-        contrasena,
-      })
+      .post<RespuestaLogin>(`${this.apiUrl}/login`, { nombre_usuario: usuario.trim(), contrasena })
       .pipe(
         map((respuesta) => {
-          this.usuarioActual = respuesta.nombre_usuario;
+          localStorage.setItem('token', respuesta.token);
+          localStorage.setItem('rol', respuesta.rol);
+          localStorage.setItem('nombre', respuesta.nombre_usuario);
           return true;
         }),
         catchError(() => of(false)),
       );
   }
 
-  // Cierra la sesión actual.
+  private leer(clave: string): string | null {
+    return this.esNavegador ? localStorage.getItem(clave) : null;
+  }
+
+  obtenerToken(): string | null {
+    return this.leer('token');
+  }
+
+  obtenerRol(): string | null {
+    return this.leer('rol');
+  }
+
+  // Revisa que exista el token y que no haya expirado.
+  estaAutenticado(): boolean {
+    const token = this.obtenerToken();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (payload.exp * 1000 > Date.now()) return true;
+    } catch {}
+    this.cerrarSesion();
+    return false;
+  }
+
+  tieneRol(roles: string[]): boolean {
+    const rol = this.obtenerRol();
+    return rol !== null && roles.includes(rol);
+  }
+
   cerrarSesion(): void {
-    this.usuarioActual = null;
+    if (!this.esNavegador) return;
+    localStorage.removeItem('token');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('nombre');
   }
 
-  // Devuelve el nombre del usuario o Invitado.
   get nombreMostrado(): string {
-    return this.usuarioActual ?? 'Invitado';
+    return this.leer('nombre') ?? 'Invitado';
   }
 
-  // Placeholder: el backend aún no maneja roles de usuario.
   get rolMostrado(): string {
-    return 'Sin rol asignado';
+    return this.leer('rol') ?? 'Sin rol asignado';
   }
 }

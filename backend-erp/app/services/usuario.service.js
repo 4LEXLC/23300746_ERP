@@ -1,6 +1,8 @@
 // CRUD de usuario: usuarios que inician sesión en el sistema.
 const conexion = require('../../config/db');
 const Usuario = require('../models/usuario.model');
+const bcrypt =require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const COLUMNAS = 'id_usuario, nombre_usuario, contrasena, rol, activo';
 
@@ -22,6 +24,7 @@ async function obtenerUsuarioPorId(id) {
 }
 
 async function crearUsuario(datos) {
+  const hash = await bcrypt.hash(datos.contrasena,10)
   const [resultado] = await conexion.promise().query(
     'INSERT INTO usuario (nombre_usuario, contrasena, rol, activo) VALUES (?, ?, ?, ?)',
     [datos.nombre_usuario, datos.contrasena, datos.rol, datos.activo]
@@ -30,6 +33,7 @@ async function crearUsuario(datos) {
 }
 
 async function actualizarUsuario(id, datos) {
+  const hash = await bcrypt.hash(datos.contrasena,10)
   await conexion.promise().query(
     'UPDATE usuario SET nombre_usuario = ?, contrasena = ?, rol = ?, activo = ? WHERE id_usuario = ?',
     [datos.nombre_usuario, datos.contrasena, datos.rol, datos.activo, id]
@@ -43,11 +47,22 @@ async function eliminarUsuario(id) {
 
 async function loginUsuario(nombre_usuario, contrasena) {
   const [filas] = await conexion.promise().query(
-    'SELECT id_usuario, nombre_usuario FROM usuario WHERE nombre_usuario = ? AND contrasena = ?',
-    [nombre_usuario, contrasena]
+    `SELECT ${COLUMNAS} FROM usuario WHERE nombre_usuario = ? AND activo = 1`,
+    [nombre_usuario]
   );
+
   if (!filas.length) return null;
-  return { id_usuario: filas[0].id_usuario, nombre_usuario: filas[0].nombre_usuario };
+
+  const usuario= filas[0];
+  const coincide = await bcrypt.compare(contrasena, usuario.contrasena);
+  if (!coincide) return null;
+
+  const token =jwt.sign(
+    {id_usuario: usuario.id_usuario, rol: usuario.rol },
+    process.env.JWT_SECRET,
+    {expiresIn: '1h'}
+  );
+  return {token, nombre_usuario: usuario.nombre_usuario, rol: usuario.rol };
 }
 
 module.exports = {

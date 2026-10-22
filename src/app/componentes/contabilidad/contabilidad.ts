@@ -1,18 +1,32 @@
 // Resumen de ingresos, egresos y reportes.
 import { Component } from '@angular/core';
 import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
+import { FormsModule } from '@angular/forms';
+import { DatosGasto, FormularioGasto } from './modales/formulario-gasto/formulario-gasto';
 
 @Component({
-  imports: [],
+  imports: [FormsModule, FormularioGasto],
   selector: 'app-contabilidad',
   styleUrl: './contabilidad.css',
   templateUrl: './contabilidad.html',
 })
 export class Contabilidad {
-  constructor(public contabilidadService: ContabilidadService) {}
 
   periodos = ['Hoy', 'Semana', 'Mes', 'Personalizado'];
   periodoActivo = 'Mes';
+  mostrarFormularioGasto = false;
+  desde = '';
+  hasta = '';
+
+  constructor(public contabilidadService: ContabilidadService) {
+    this.contabilidadService.establecerPeriodo(this.periodoActivo);
+  }
+
+  // Cambia el periodo y recalcula el rango de fechas.
+  seleccionarPeriodo(periodo: string): void {
+    this.periodoActivo = periodo;
+    this.contabilidadService.establecerPeriodo(periodo, this.desde, this.hasta);
+  }
 
   // Obtiene los indicadores financieros.
   get kpis() {
@@ -26,7 +40,7 @@ export class Contabilidad {
 
   // Obtiene el historial de movimientos.
   get movimientos() {
-    return this.contabilidadService.movimientos;
+    return this.contabilidadService.movimientosFiltrados();
   }
 
   get resumenMensual() {
@@ -46,6 +60,12 @@ export class Contabilidad {
   // Obtiene el total de egresos.
   get egresosTotal(): number {
     return this.contabilidadService.egresosTotal;
+  }
+
+  // Registra el gasto como egreso de Servicios y renta.
+  registrarGasto(datos: DatosGasto): void {
+    this.contabilidadService.registrarEgreso(datos.concepto, datos.monto, 'Servicios y renta');
+    this.mostrarFormularioGasto = false;
   }
 
   // Abre la impresión del reporte.

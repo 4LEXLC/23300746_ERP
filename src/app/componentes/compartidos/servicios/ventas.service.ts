@@ -1,5 +1,5 @@
 // Ventas reales contra las tablas venta, pago, factura y cliente.
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, switchMap, tap } from 'rxjs';
 import { API_URL } from './api.config';
@@ -61,7 +61,7 @@ export class VentasService {
   private readonly urlFactura = `${API_URL}/factura`;
   private readonly urlCliente = `${API_URL}/cliente`;
 
-  ventas: Venta[] = [];
+  ventas = signal<Venta[]>([]);
 
   constructor(private http: HttpClient) {
     this.cargarVentas();
@@ -73,7 +73,7 @@ export class VentasService {
       pagos: this.http.get<PagoBackend[]>(this.urlPago),
       facturas: this.http.get<FacturaBackend[]>(this.urlFactura),
     }).subscribe(({ ventas, pagos, facturas }) => {
-      this.ventas = ventas.map((v) => this.aFrontend(v, pagos, facturas));
+      this.ventas.set(ventas.map((v) => this.aFrontend(v, pagos, facturas)));
     });
   }
 
@@ -98,26 +98,26 @@ export class VentasService {
 
   // Obtiene la cantidad de ventas registradas.
   get totalVentas(): number {
-    return this.ventas.length;
+    return this.ventas().length;
   }
 
   // Cuenta las ventas con factura emitida.
   get totalFacturadas(): number {
-    return this.ventas.filter((v) => v.factura === 'emitida').length;
+    return this.ventas().filter((v) => v.factura === 'emitida').length;
   }
 
   // Crea la venta, registra su pago y actualiza el historial local.
-  registrarVenta(items: ItemVenta[], subtotal: number, iva: number, total: number, metodoPago: string): Observable<Venta> {
+  registrarVenta(items: ItemVenta[], subtotal: number, iva: number, total: number, metodoPago: string, referencia: string | null = null): Observable<Venta> {
     return this.http
       .post<VentaBackend>(this.urlVenta, { id_trabajador: null, productos: items, subtotal, iva, total, estado: 'completada' })
       .pipe(
         switchMap((venta) =>
           this.http
-            .post<PagoBackend>(this.urlPago, { id_venta: venta.id_venta, metodo_pago: metodoPago, referencia_transaccion: null, monto: total, estado: 'completado' })
+            .post<PagoBackend>(this.urlPago, { id_venta: venta.id_venta, metodo_pago: metodoPago, referencia_transaccion: referencia, monto: total, estado: 'completado' })
             .pipe(map((pago) => this.aFrontend(venta, [pago], []))),
         ),
         tap((venta) => {
-          this.ventas = [venta, ...this.ventas];
+          this.ventas.update((lista) => [venta, ...lista]);
         }),
       );
   }
@@ -144,8 +144,10 @@ export class VentasService {
           });
         }),
         tap((factura) => {
-          this.ventas = this.ventas.map((v) =>
-            v.id_venta === venta.id_venta ? { ...v, factura: 'emitida', folioFactura: factura.folio, id_factura: factura.id_factura } : v,
+          this.ventas.update((lista) =>
+            lista.map((v) =>
+              v.id_venta === venta.id_venta ? { ...v, factura: 'emitida', folioFactura: factura.folio, id_factura: factura.id_factura } : v,
+            ),
           );
         }),
         map((factura) => ({ ...venta, factura: 'emitida' as const, folioFactura: factura.folio, id_factura: factura.id_factura })),
@@ -156,8 +158,10 @@ export class VentasService {
   cancelarFactura(venta: Venta): void {
     if (!venta.id_factura) return;
     this.http.delete(`${this.urlFactura}/${venta.id_factura}`).subscribe(() => {
-      this.ventas = this.ventas.map((v) =>
-        v.id_venta === venta.id_venta ? { ...v, factura: 'sin-facturar', folioFactura: undefined, id_factura: undefined } : v,
+      this.ventas.update((lista) =>
+        lista.map((v) =>
+          v.id_venta === venta.id_venta ? { ...v, factura: 'sin-facturar', folioFactura: undefined, id_factura: undefined } : v,
+        ),
       );
     });
   }

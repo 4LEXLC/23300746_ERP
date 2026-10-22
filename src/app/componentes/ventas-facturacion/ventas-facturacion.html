@@ -2,9 +2,13 @@
       <header class="page-head">
         <hgroup>
           <h1>Ventas y Facturación</h1>
-          <p>{{ totalVentas }} ventas este mes · {{ totalFacturadas }} facturas emitidas</p>
+          <p>{{ totalVentas }} ventas · {{ totalFacturadas }} facturas emitidas</p>
         </hgroup>
-        <button type="button" class="f-select">Últimos 7 días<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+        <select class="f-select" [(ngModel)]="diasPeriodo" aria-label="Periodo">
+          @for (p of periodos; track p.dias) {
+            <option [ngValue]="p.dias">{{ p.etiqueta }}</option>
+          }
+        </select>
       </header>
 
       <nav class="tabs">
@@ -49,7 +53,7 @@
                   </td>
                 </tr>
               } @empty {
-                <tr><td class="empty-row" colspan="7">No hay facturas emitidas todavía.</td></tr>
+                <tr><td class="empty-row" colspan="7">No hay registros en este periodo.</td></tr>
               }
             </tbody>
           </table>

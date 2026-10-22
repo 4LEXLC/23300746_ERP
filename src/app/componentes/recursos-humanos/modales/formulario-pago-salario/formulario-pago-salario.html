@@ -15,12 +15,12 @@
     <section class="modal-body">
       <section class="field">
         <label for="ps-trabajador">Trabajador <span class="req">*</span></label>
-        <select id="ps-trabajador" class="box" name="trabajador" [(ngModel)]="datos.trabajador" required>
+        <select id="ps-trabajador" class="box" name="trabajador" [(ngModel)]="datos.trabajador" (ngModelChange)="alElegirTrabajador($event)" required>
           @for (trabajador of trabajadores; track trabajador) {
             <option [value]="trabajador">{{ trabajador }}</option>
           }
         </select>
-        <p class="hint">Solo se listan trabajadores con pago pendiente</p>
+        <p class="hint">Solo se listan trabajadores activos</p>
       </section>
 
       <section class="field-row">

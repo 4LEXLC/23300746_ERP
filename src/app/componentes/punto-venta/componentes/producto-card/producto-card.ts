@@ -2,6 +2,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 export interface Producto {
+  id_producto: number;
   nombre: string;
   categoria: string;
   precio: number;

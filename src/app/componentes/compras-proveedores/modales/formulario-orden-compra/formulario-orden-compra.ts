@@ -36,7 +36,7 @@ export class FormularioOrdenCompra {
 
   // Consulta el catálogo para la orden de compra.
   get productosDisponibles() {
-    return this.inventarioService.productos;
+    return this.inventarioService.productos();
   }
 
   productoSeleccionado = '';

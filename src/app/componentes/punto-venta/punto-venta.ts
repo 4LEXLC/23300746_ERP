@@ -30,14 +30,15 @@ export class PuntoVenta {
 
   // Obtiene las categorías sin repetirlas.
   get categorias(): string[] {
-    return ['Todos', ...new Set(this.inventarioService.productos.map((p) => p.categoria))];
+    return ['Todos', ...new Set(this.inventarioService.productos().map((p) => p.categoria))];
   }
 
   // Obtiene los productos que utiliza esta pantalla.
   get productos(): Producto[] {
-    return this.inventarioService.productos
+    return this.inventarioService.productos()
       .filter((p) => p.estado === 'activo')
       .map((p) => ({
+        id_producto: p.id_producto ?? 0,
         nombre: p.nombre,
         categoria: p.categoria,
         precio: p.precio,

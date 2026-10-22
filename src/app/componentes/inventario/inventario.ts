@@ -22,12 +22,12 @@ export class Inventario {
 
   // Obtiene los productos que utiliza esta pantalla.
   get productos(): ProductoInventario[] {
-    return this.inventarioService.productos;
+    return this.inventarioService.productos();
   }
 
   // Obtiene el historial de movimientos.
   get movimientos() {
-    return this.inventarioService.movimientos;
+    return this.inventarioService.movimientos();
   }
 
   // Obtiene las categorías sin repetirlas.

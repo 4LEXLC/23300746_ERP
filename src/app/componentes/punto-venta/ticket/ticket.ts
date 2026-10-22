@@ -24,7 +24,7 @@ export class Ticket {
 
   // Factura la última venta y prepara un nuevo pedido.
   guardarFacturacion(datosCliente: DatosCliente): void {
-    const venta = this.ventasService.ventas.find(
+    const venta = this.ventasService.ventas().find(
       (venta) => venta.folio === this.carritoService.ultimoFolio,
     );
     this.mostrarFormularioCliente = false;

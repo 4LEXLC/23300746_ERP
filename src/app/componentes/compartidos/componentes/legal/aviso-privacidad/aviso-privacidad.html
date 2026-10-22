@@ -1,0 +1,67 @@
+<main class="legal">
+  <button type="button" class="volver" (click)="volver()">← Volver</button>
+
+  <h1>Aviso de privacidad</h1>
+  <p class="fecha">Última actualización: {{ actualizacion }}</p>
+
+  <section>
+    <h2>1. Responsable de tus datos</h2>
+    <p><strong>Cafetería ERP</strong>, con RFC EKU9003173C9 y domicilio en Calle Ejemplo 123, Col. Centro, C.P. 44100, Guadalajara, Jalisco, es responsable del uso y protección de tus datos personales, de acuerdo con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</p>
+  </section>
+
+  <section>
+    <h2>2. Datos que recabamos</h2>
+    <p>Solo pedimos los datos necesarios según el servicio que uses. Si pagas en efectivo y no pides factura, no te pedimos ningún dato personal.</p>
+    <ul>
+      <li><strong>Clientes que piden factura:</strong> nombre o razón social, RFC, código postal, régimen fiscal y correo electrónico.</li>
+      <li><strong>Clientes que pagan con PayPal:</strong> PayPal nos comparte tu nombre y tu correo solo para enviarte la confirmación del pago; no los guardamos. Del pago únicamente guardamos el método de pago, el número de transacción, el monto y la fecha. <strong>No recabamos ni guardamos datos de tarjetas</strong>; esos los procesa directamente PayPal.</li>
+      <li><strong>Trabajadores:</strong> nombre, correo, teléfono, puesto, salario, fecha de contratación, horario, registros de asistencia (entradas y salidas) y solicitudes de permisos o vacaciones. Al pedir un permiso no es necesario dar detalles médicos.</li>
+      <li><strong>Usuarios del sistema:</strong> nombre de usuario, rol y contraseña.</li>
+    </ul>
+    <p><strong>No recabamos datos personales sensibles</strong>, como información de salud, creencias religiosas u origen étnico.</p>
+  </section>
+
+  <section>
+    <h2>3. Para qué usamos tus datos</h2>
+    <ul>
+      <li>Emitir y enviarte tus facturas.</li>
+      <li>Enviarte la confirmación de tus pagos.</li>
+      <li>Registrar las ventas y los pagos.</li>
+      <li>Administrar al personal: nómina, horarios, asistencia, permisos y vacaciones.</li>
+      <li>Dar acceso al sistema según el rol de cada usuario.</li>
+      <li>Cumplir con nuestras obligaciones fiscales y laborales.</li>
+    </ul>
+    <p>Todas estas finalidades son necesarias para darte el servicio o para cumplir con la ley. No tenemos finalidades secundarias: no usamos tus datos para publicidad ni para ningún otro fin.</p>
+  </section>
+
+  <section>
+    <h2>4. Con quién compartimos tus datos</h2>
+    <ul>
+      <li><strong>PayPal:</strong> procesa los pagos electrónicos. Tus datos de pago se los das directamente a PayPal y se rigen por su propio aviso de privacidad; nosotros solo le enviamos el monto a cobrar.</li>
+      <li><strong>Autoridades fiscales (SAT):</strong> cuando la ley nos lo pida.</li>
+    </ul>
+    <p>No vendemos, rentamos ni compartimos tus datos con nadie más.</p>
+  </section>
+
+  <section>
+    <h2>5. Tus derechos ARCO</h2>
+    <p>Tienes derecho a <strong>Acceder</strong> a tus datos, <strong>Rectificarlos</strong> si están mal, <strong>Cancelarlos</strong> (pedir que se borren) y <strong>Oponerte</strong> a que los usemos para algún fin.</p>
+    <p>Para ejercer cualquiera de estos derechos, escribe a <strong>privacidad&#64;cafeteriaerp.com</strong> con tu nombre, una copia de tu identificación oficial, el derecho que quieres ejercer y los datos a los que se refiere. Te respondemos en un máximo de 20 días hábiles y, si tu solicitud procede, la aplicamos dentro de los 15 días hábiles siguientes.</p>
+  </section>
+
+  <section>
+    <h2>6. Revocar tu consentimiento o limitar el uso de tus datos</h2>
+    <p>En cualquier momento puedes revocar tu consentimiento o pedirnos que limitemos el uso o la divulgación de tus datos, escribiendo a <strong>privacidad&#64;cafeteriaerp.com</strong>. Te respondemos en los mismos plazos que una solicitud ARCO.</p>
+    <p>Ten en cuenta que la revocación no afecta lo que se hizo antes de pedirla, que hay datos que la ley nos obliga a conservar (como los de tus facturas) y que sin ciertos datos ya no podríamos darte algunos servicios, como emitir tu factura.</p>
+  </section>
+
+  <section>
+    <h2>7. Cómo protegemos tus datos</h2>
+    <p>Las contraseñas se guardan protegidas con hash (bcrypt), nunca en texto plano. Para entrar al sistema hay que iniciar sesión, y la información del personal (salarios, horarios, asistencias y permisos) solo la puede consultar el administrador.</p>
+  </section>
+
+  <section>
+    <h2>8. Cambios a este aviso</h2>
+    <p>Si cambiamos este aviso, publicaremos la nueva versión en esta misma página con su fecha de actualización.</p>
+  </section>
+</main>

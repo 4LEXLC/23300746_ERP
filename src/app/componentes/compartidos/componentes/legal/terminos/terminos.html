@@ -1,0 +1,89 @@
+<main class="legal">
+  <button type="button" class="volver" (click)="volver()">← Volver</button>
+
+  <h1>Términos y condiciones</h1>
+  <p class="fecha">Última actualización: {{ actualizacion }}</p>
+
+  <p>Estos términos son las reglas para usar el sistema Cafetería ERP y para comprar en la cafetería. Al usar el sistema o hacer una compra, aceptas estos términos. Si no estás de acuerdo con ellos, no debes realizar la compra.</p>
+
+  <section>
+    <h2>1. Identificación del responsable</h2>
+    <p>El responsable del sistema y de las ventas es <strong>Cafetería ERP</strong>, con RFC EKU9003173C9 y domicilio en Calle Ejemplo 123, Col. Centro, C.P. 44100, Guadalajara, Jalisco. Correo de contacto: <strong>contacto&#64;cafeteriaerp.com</strong>.</p>
+  </section>
+
+  <section>
+    <h2>2. Uso del sitio</h2>
+    <p>Cafetería ERP es el sistema con el que la cafetería maneja su punto de venta, inventario, ventas y facturación, compras, contabilidad y recursos humanos. Es de uso exclusivo del personal autorizado y solo debe usarse para la operación del negocio. Está prohibido compartir el acceso, intentar entrar a secciones que no corresponden a tu rol o modificar información sin autorización.</p>
+  </section>
+
+  <section>
+    <h2>3. Registro de usuarios</h2>
+    <p>No hay registro público: las cuentas las crea el administrador. Cada usuario tiene un rol que define qué partes del sistema puede usar: el <strong>cajero</strong> solo usa el punto de venta y el <strong>administrador</strong> tiene acceso a todo. Cada usuario es responsable de cuidar su contraseña y de las operaciones que se hagan con su cuenta. El administrador puede desactivar una cuenta si se usa de forma indebida o si la persona deja de trabajar en la cafetería.</p>
+  </section>
+
+  <section>
+    <h2>4. Productos y servicios</h2>
+    <p>La cafetería vende bebidas calientes, bebidas frías, repostería y alimentos, preparados al momento. Todos los productos están sujetos a existencias: si un producto se agota, no se puede vender hasta que se vuelva a surtir.</p>
+  </section>
+
+  <section>
+    <h2>5. Precios</h2>
+    <p>Todos los precios están en pesos mexicanos (MXN) e incluyen el 16 % de IVA, que se muestra desglosado en el ticket. Los precios pueden cambiar sin previo aviso, pero siempre se cobra el precio que aparece al momento de confirmar el pedido.</p>
+  </section>
+
+  <section>
+    <h2>6. Método de pago</h2>
+    <p>Aceptamos pagos en efectivo y con tarjeta o cuenta PayPal. Los pagos electrónicos se procesan a través de PayPal: la cafetería <strong>no recibe ni guarda</strong> los datos de tu tarjeta. Una compra con PayPal se considera pagada solo cuando PayPal confirma el cobro.</p>
+    <p><strong>Facturación:</strong> si necesitas factura, pídela al momento de la compra y proporciona tu nombre o razón social, RFC, código postal, régimen fiscal y correo electrónico. La factura se envía en formato XML al correo que indiques. Tú eres responsable de que tus datos fiscales sean correctos.</p>
+  </section>
+
+  <section>
+    <h2>7. Envíos y entregas</h2>
+    <p>La cafetería no hace envíos a domicilio. Los pedidos se preparan al momento y se entregan en el mostrador una vez que el pago está confirmado.</p>
+  </section>
+
+  <section>
+    <h2>8. Cancelaciones</h2>
+    <p>Puedes cancelar tu pedido sin costo mientras no lo hayas pagado. Ya pagado, solo se puede cancelar si aún no se empieza a preparar; en ese caso te devolvemos el total por el mismo medio con el que pagaste. Si hubo un error en el cobro, como un cargo doble, repórtalo en caja con tu ticket y lo corregimos. Si necesitas corregir tu factura, la cancelamos y te emitimos una nueva con los datos correctos.</p>
+  </section>
+
+  <section>
+    <h2>9. Devoluciones</h2>
+    <p>Como los alimentos y bebidas se preparan al momento, no hay devoluciones por cambio de opinión una vez entregado el pedido. Si el producto está en mal estado o no es lo que pediste, aplica la garantía del punto 10. Cuando proceda devolver dinero, se hace por el mismo medio de pago: en efectivo si pagaste en efectivo, o a tu cuenta o tarjeta si pagaste con PayPal.</p>
+  </section>
+
+  <section>
+    <h2>10. Garantías</h2>
+    <p>Garantizamos que lo que te entregamos es lo que pediste y está en buen estado. Si tu producto sale mal preparado, en mal estado, incompleto o no es lo que pediste, avísanos en caja con tu ticket, de preferencia el mismo día, y tú eliges si te lo reponemos o te devolvemos tu dinero, conforme a la Ley Federal de Protección al Consumidor.</p>
+  </section>
+
+  <section>
+    <h2>11. Responsabilidades</h2>
+    <ul>
+      <li><strong>La cafetería</strong> se compromete a cobrar el precio publicado, entregar lo que pediste y cuidar tus datos como se explica en el aviso de privacidad.</li>
+      <li><strong>Los usuarios del sistema</strong> responden por las operaciones hechas con su cuenta y por usar el sistema solo para su trabajo.</li>
+      <li><strong>El cliente</strong> es responsable de revisar su pedido y su ticket, y de dar datos fiscales correctos.</li>
+      <li>La cafetería no controla servicios externos como PayPal, el internet o el correo electrónico, por lo que no es responsable de sus fallas. Aun así, si se hizo un cargo y tu pedido no quedó registrado, repórtalo en caja y lo revisamos.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>12. Propiedad intelectual</h2>
+    <p>El nombre, el diseño del sistema, los textos, las imágenes y el código de Cafetería ERP pertenecen a la cafetería y están protegidos por la Ley Federal del Derecho de Autor y demás leyes de propiedad intelectual. No se pueden copiar, modificar ni distribuir sin autorización. Las marcas de terceros, como PayPal, pertenecen a sus respectivos dueños.</p>
+  </section>
+
+  <section>
+    <h2>13. Privacidad</h2>
+    <p>Qué datos personales pedimos, para qué los usamos y cómo ejercer tus derechos ARCO se explica en nuestro <a routerLink="/aviso-privacidad">aviso de privacidad</a>.</p>
+  </section>
+
+  <section>
+    <h2>14. Modificaciones</h2>
+    <p>La cafetería puede actualizar estos términos en cualquier momento. La nueva versión se publica en esta misma página con su fecha de actualización y aplica desde ese día; no afecta las compras que ya se hicieron.</p>
+  </section>
+
+  <section>
+    <h2>15. Contacto</h2>
+    <p>Para dudas, quejas o aclaraciones sobre estos términos, acude a caja o escribe a <strong>contacto&#64;cafeteriaerp.com</strong>.</p>
+  </section>
+</main>

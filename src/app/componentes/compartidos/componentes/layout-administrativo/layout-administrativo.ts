@@ -3,9 +3,10 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { Topbar } from '../topbar/topbar';
+import { Footer } from '../footer/footer/footer';
 
 @Component({
-  imports: [RouterOutlet, Sidebar, Topbar],
+  imports: [RouterOutlet, Sidebar, Topbar, Footer],
   selector: 'app-layout-administrativo',
   styleUrl: './layout-administrativo.css',
   templateUrl: './layout-administrativo.html',

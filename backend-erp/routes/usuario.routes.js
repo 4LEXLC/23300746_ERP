@@ -1,3 +1,5 @@
+const {verificarToken, requiereRol} = require ('../middleware/auth.middleware');
+
 // Rutas HTTP (GET/POST/PUT/DELETE) para usuario.
 const express = require('express');
 const {
@@ -25,6 +27,8 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ mensaje: 'No se pudo iniciar sesión.' });
   }
 });
+
+router.use(verificarToken,requiereRol('admin'));
 
 router.get('/', async (req, res) => {
   try {

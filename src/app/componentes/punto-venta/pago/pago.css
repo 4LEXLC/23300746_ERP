@@ -406,3 +406,19 @@ dd {
 .gateway-btn.crit {
   background: var(--critical);
 }
+
+.acepto {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.acepto input {
+  margin-top: 3px;
+}
+.acepto a {
+  color: inherit;
+  font-weight: 600;
+}
