@@ -1,7 +1,7 @@
 <!-- Captura de productos y cantidades de una compra. -->
 <aside class="overlay" (click)="cerrar.emit()">
   <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
-  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+  <form class="modal" #f="ngForm" (click)="$event.stopPropagation()" (ngSubmit)="f.valid && onGuardar()">
     <header class="modal-head">
       <hgroup>
         <h3>Nueva orden de compra</h3>
@@ -31,7 +31,6 @@
 
       <header class="items-head">
         <label>Productos a solicitar <span class="req">*</span></label>
-        <p class="csub">El proveedor entrega el producto ya preparado; se suma directo al inventario al recibirlo.</p>
       </header>
       <section class="add-panel">
         <section class="field add-field">
@@ -57,7 +56,7 @@
           </section>
           <section class="field add-field">
             <label for="oc-nuevo-precio">Precio de compra</label>
-            <input id="oc-nuevo-precio" class="box" type="number" min="0" step="0.01" name="nuevoPrecio" [(ngModel)]="nuevoPrecio" [ngModelOptions]="{ standalone: true }" />
+            <input id="oc-nuevo-precio" class="box" type="number" min="0.01" step="0.01" name="nuevoPrecio" [(ngModel)]="nuevoPrecio" [ngModelOptions]="{ standalone: true }" />
           </section>
           <button type="button" class="mini-add" (click)="agregarItem()">
             <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
@@ -65,6 +64,10 @@
           </button>
         </section>
       </section>
+
+      @if (error) {
+        <small class="error">{{ error }}</small>
+      }
 
       <ul class="items-list">
         @for (item of items; track item.nombre + $index) {

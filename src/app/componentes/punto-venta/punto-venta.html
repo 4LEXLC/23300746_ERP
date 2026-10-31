@@ -1,5 +1,8 @@
 <!-- Selección de productos y confirmación del pedido. -->
-<app-sidebar />
+<!-- El cajero solo ve la barra superior; el menú lateral es del administrador. -->
+@if (esAdmin) {
+  <app-sidebar />
+}
 
 <header class="topbar">
   <span class="brand">

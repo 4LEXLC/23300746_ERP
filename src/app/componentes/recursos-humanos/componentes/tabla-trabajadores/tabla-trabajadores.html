@@ -9,10 +9,11 @@
         <th>Salario</th>
         <th>Horario</th>
         <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      @for (trabajador of trabajadores; track trabajador.nombre) {
+      @for (trabajador of trabajadores; track trabajador.id_trabajador) {
         <tr>
           <td>
             <span class="who">
@@ -28,6 +29,12 @@
             <span class="badge" [class]="trabajador.estado">
               <span class="dotb"></span>{{ trabajador.estado === 'activo' ? 'Activo' : 'Baja' }}
             </span>
+          </td>
+          <td class="acciones">
+            <button type="button" class="act" (click)="editar.emit(trabajador)">Editar</button>
+            <button type="button" class="act" (click)="cambiarEstado.emit(trabajador)">
+              {{ trabajador.estado === 'activo' ? 'Dar de baja' : 'Reactivar' }}
+            </button>
           </td>
         </tr>
       }

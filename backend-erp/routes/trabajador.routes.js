@@ -1,5 +1,6 @@
 // Rutas HTTP (GET/POST/PUT/DELETE) para trabajador.
 const express = require('express');
+const { validarTrabajador } = require('../app/validaciones');
 const {
   obtenerTrabajadors,
   obtenerTrabajadorPorId,
@@ -31,6 +32,8 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+  const error = validarTrabajador(req.body, true);
+  if (error) return res.status(400).json({ mensaje: error });
   try {
     const nuevoRegistro = await crearTrabajador(req.body);
     res.status(201).json(nuevoRegistro);
@@ -41,6 +44,8 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  const error = validarTrabajador(req.body, false);
+  if (error) return res.status(400).json({ mensaje: error });
   try {
     const registroActualizado = await actualizarTrabajador(req.params.id, req.body);
     if (!registroActualizado) return res.status(404).json({ mensaje: 'Registro no encontrado.' });

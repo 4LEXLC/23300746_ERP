@@ -1,10 +1,9 @@
-<!-- Captura de datos del cliente para facturación. -->
+<!-- Captura y edición de los datos fiscales del cliente. -->
 <aside class="overlay" (click)="cerrar.emit()">
-  <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
-  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+  <form class="modal" #f="ngForm" (click)="$event.stopPropagation()" (ngSubmit)="f.valid && onGuardar()">
     <header class="modal-head">
       <hgroup>
-        <h3>Registrar cliente para facturación</h3>
+        <h3>{{ editando ? 'Editar cliente' : 'Registrar cliente para facturación' }}</h3>
         <p>Captura los datos fiscales para emitir la factura</p>
       </hgroup>
       <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
@@ -15,37 +14,56 @@
     <section class="modal-body">
       <section class="field">
         <label for="c-nombre">Nombre o razón social <span class="req">*</span></label>
-        <input id="c-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Distribuidora García S.A. de C.V." required />
+        <input id="c-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" #nombre="ngModel"
+               placeholder="Ej. Distribuidora García S.A. de C.V." required maxlength="150" />
+        @if (nombre.invalid && (nombre.touched || f.submitted)) {
+          <small class="error">El nombre o razón social es obligatorio.</small>
+        }
       </section>
       <section class="field-row">
         <section class="field">
           <label for="c-rfc">RFC <span class="req">*</span></label>
-          <input id="c-rfc" class="box" type="text" name="rfc" [(ngModel)]="datos.rfc" placeholder="XAXX010101000" required />
+          <input id="c-rfc" class="box" type="text" name="rfc" [(ngModel)]="datos.rfc" #rfc="ngModel"
+                 placeholder="XAXX010101000" required maxlength="13" pattern="[A-Za-zÑñ]{3,4}[0-9]{6}[A-Za-z0-9]{3}" />
+          @if (rfc.invalid && (rfc.touched || f.submitted)) {
+            <small class="error">RFC de 12 o 13 caracteres, ej. XAXX010101000.</small>
+          }
         </section>
         <section class="field">
           <label for="c-cp">Código postal <span class="req">*</span></label>
-          <input id="c-cp" class="box" type="text" name="codigoPostal" [(ngModel)]="datos.codigoPostal" placeholder="00000" required />
+          <input id="c-cp" class="box" type="text" inputmode="numeric" name="codigoPostal" [(ngModel)]="datos.codigoPostal" #cp="ngModel"
+                 placeholder="00000" required maxlength="5" pattern="[0-9]{5}" />
+          @if (cp.invalid && (cp.touched || f.submitted)) {
+            <small class="error">El código postal debe tener 5 dígitos.</small>
+          }
         </section>
       </section>
       <section class="field">
         <label for="c-regimen">Régimen fiscal <span class="req">*</span></label>
-        <select id="c-regimen" class="box" name="regimenFiscal" [(ngModel)]="datos.regimenFiscal" required>
+        <select id="c-regimen" class="box" name="regimenFiscal" [(ngModel)]="datos.regimenFiscal" #regimen="ngModel" required>
           <option value="" disabled>Selecciona un régimen</option>
-          @for (regimen of regimenes; track regimen) {
-            <option [value]="regimen">{{ regimen }}</option>
+          @for (r of regimenes; track r) {
+            <option [value]="r">{{ r }}</option>
           }
         </select>
+        @if (regimen.invalid && (regimen.touched || f.submitted)) {
+          <small class="error">Selecciona el régimen fiscal.</small>
+        }
       </section>
       <section class="field">
         <label for="c-correo">Correo electrónico</label>
-        <input id="c-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" placeholder="correo@cliente.mx" />
+        <input id="c-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" #correo="ngModel"
+               placeholder="correo@cliente.mx" email />
+        @if (correo.invalid && (correo.touched || f.submitted)) {
+          <small class="error">Escribe un correo válido, ej. nombre@dominio.com.</small>
+        }
       </section>
     </section>
 
     <footer class="modal-foot">
       <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
       <button type="submit" class="btn btn-pri">
-        Guardar cliente
+        {{ editando ? 'Guardar cambios' : 'Guardar cliente' }}
         <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
       </button>
     </footer>

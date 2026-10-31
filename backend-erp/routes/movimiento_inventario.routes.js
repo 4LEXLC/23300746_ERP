@@ -1,5 +1,6 @@
 // Rutas HTTP (GET/POST/PUT/DELETE) para movimiento_inventario.
 const express = require('express');
+const { requiereRol } = require('../middleware/auth.middleware');
 const {
   obtenerMovimientoInventarios,
   obtenerMovimientoInventarioPorId,
@@ -10,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', requiereRol('admin'), async (req, res) => {
   try {
     res.json(await obtenerMovimientoInventarios());
   } catch (error) {
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requiereRol('admin'), async (req, res) => {
   try {
     const registro = await obtenerMovimientoInventarioPorId(req.params.id);
     if (!registro) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -31,6 +32,10 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+  // El cajero solo registra lo que genera una venta; el resto es del administrador.
+  if (req.usuario.rol !== 'admin' && (req.body.tipo !== 'salida')) {
+    return res.status(403).json({ mensaje: 'El cajero solo puede registrar salidas por venta.' });
+  }
   try {
     const nuevoRegistro = await crearMovimientoInventario(req.body);
     res.status(201).json(nuevoRegistro);
@@ -40,7 +45,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requiereRol('admin'), async (req, res) => {
   try {
     const registroActualizado = await actualizarMovimientoInventario(req.params.id, req.body);
     if (!registroActualizado) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -51,7 +56,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requiereRol('admin'), async (req, res) => {
   try {
     await eliminarMovimientoInventario(req.params.id);
     res.status(204).send();

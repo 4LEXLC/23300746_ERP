@@ -78,11 +78,10 @@ export class ContabilidadService {
   }
 }
 
-  constructor(private http: HttpClient) {
-    this.cargarMovimientos();
-  }
+  constructor(private http: HttpClient) {}
 
-  private cargarMovimientos(): void {
+  // Solo las pantallas del administrador piden la lista; el cajero no la consulta.
+  cargar(): void {
     this.http.get<MovimientoBackend[]>(this.apiUrl).subscribe((datos) => {
       this.movimientos.set(datos.map((m) => this.aFrontend(m)));
     });
@@ -145,6 +144,16 @@ export class ContabilidadService {
     return this.ingresos - this.ingresos / 1.16;
   }
 
+  // Total de ventas del periodo (ingresos que vienen de una venta).
+  get totalVentas(): number {
+    return this.movimientosFiltrados().filter((m) => m.tipo === 'ingreso' && m.id_venta).reduce((s, m) => s + m.monto, 0);
+  }
+
+  // Total de compras del periodo (egresos que vienen de una compra recibida).
+  get totalCompras(): number {
+    return this.movimientosFiltrados().filter((m) => m.tipo === 'egreso' && m.id_compra).reduce((s, m) => s + m.monto, 0);
+  }
+
   // Obtiene los indicadores financieros.
   get kpis(): { etiqueta: string; valor: number }[] {
     return [
@@ -152,6 +161,8 @@ export class ContabilidadService {
       { etiqueta: 'Egresos', valor: this.egresosTotal },
       { etiqueta: 'Utilidad', valor: this.utilidad },
       { etiqueta: 'IVA recaudado', valor: this.ivaRecaudado },
+      { etiqueta: 'Total de ventas', valor: this.totalVentas },
+      { etiqueta: 'Total de compras', valor: this.totalCompras },
     ];
   }
 

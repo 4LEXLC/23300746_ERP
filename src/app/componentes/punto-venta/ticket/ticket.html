@@ -17,7 +17,7 @@
     <hr class="r-div" />
     <dl class="r-meta"><dt>Folio</dt><dd>{{ carritoService.ultimoFolio || '—' }}</dd></dl>
     <dl class="r-meta"><dt>Fecha</dt><dd>{{ hoy | date: 'dd/MM/yyyy HH:mm' }}</dd></dl>
-    <dl class="r-meta"><dt>Cajero</dt><dd>Usuario</dd></dl>
+    <dl class="r-meta"><dt>Cajero</dt><dd>{{ authService.nombreMostrado }}</dd></dl>
     <hr class="r-div" />
     <ul class="r-items">
       @for (item of carritoService.items; track item.producto.nombre) {
@@ -34,7 +34,7 @@
     <p class="r-tot-row"><span>IVA (16%)</span><span>${{ carritoService.iva.toFixed(2) }}</span></p>
     <p class="r-tot-row grand"><span>Total</span><span>${{ carritoService.total.toFixed(2) }}</span></p>
     <dl class="r-meta r-meta-pago"><dt>Método de pago</dt><dd>{{ metodoPagoEtiqueta }}</dd></dl>
-    <p class="r-stamp">TICKET DE MUESTRA</p>
+    <p class="r-stamp">PAGO APROBADO</p>
     <span class="barcode"></span>
     <p class="r-foot">¡Gracias por tu compra!<br />Conserva tu ticket para cualquier aclaración.</p>
   </article>

@@ -98,3 +98,16 @@ tbody tr:last-child td {
   border: none;
   cursor: pointer;
 }
+
+.acciones {
+  white-space: nowrap;
+}
+
+.act {
+  margin-right: 6px;
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}

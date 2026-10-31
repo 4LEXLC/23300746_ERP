@@ -1,0 +1,30 @@
+.calendario {
+  margin-top: 24px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 0.85rem;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+.turno {
+  background: var(--accent-soft, #f3e9df);
+  color: var(--accent, #6b4226);
+  font-weight: 600;
+}

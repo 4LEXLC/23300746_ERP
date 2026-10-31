@@ -1,0 +1,63 @@
+<!-- Detalle de la venta, su pago y su factura. -->
+<aside class="overlay" (click)="cerrar.emit()">
+  <article class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Venta {{ venta.folio }}</h3>
+        <p>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }} · Cajero: {{ venta.cajero }}</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <p class="section-lbl">Productos</p>
+      <table class="detalle">
+        <thead>
+          <tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Importe</th></tr>
+        </thead>
+        <tbody>
+          @for (item of venta.items; track $index) {
+            <tr>
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>${{ item.precioUnitario.toFixed(2) }}</td>
+              <td>${{ (item.cantidad * item.precioUnitario).toFixed(2) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <dl class="datos">
+        <dt>Subtotal</dt><dd>${{ venta.subtotal.toFixed(2) }}</dd>
+        <dt>IVA</dt><dd>${{ venta.iva.toFixed(2) }}</dd>
+        <dt>Total</dt><dd><b>${{ venta.total.toFixed(2) }}</b></dd>
+      </dl>
+
+      <p class="section-lbl">Pago</p>
+      @if (venta.pago; as pago) {
+        <dl class="datos">
+          <dt>Método</dt><dd>{{ pago.metodo_pago }}</dd>
+          <dt>Estado</dt><dd>{{ pago.estado }}</dd>
+          <dt>Monto</dt><dd>${{ pago.monto }}</dd>
+          <dt>Referencia</dt><dd>{{ pago.referencia_transaccion || 'Sin referencia (efectivo)' }}</dd>
+          <dt>Fecha</dt><dd>{{ pago.fecha | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </dl>
+      } @else {
+        <p>Sin pago registrado.</p>
+      }
+
+      <p class="section-lbl">Factura</p>
+      @if (venta.factura !== 'sin-facturar') {
+        <dl class="datos">
+          <dt>Folio</dt><dd>{{ venta.folioFactura }}</dd>
+          <dt>Emisión</dt><dd>{{ venta.fechaFactura | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          <dt>Estado</dt><dd>{{ venta.factura === 'cancelada' ? 'Cancelada' : 'Vigente' }}</dd>
+          <dt>Total</dt><dd>${{ venta.total.toFixed(2) }}</dd>
+        </dl>
+      } @else {
+        <p>Esta venta no tiene factura.</p>
+      }
+    </section>
+  </article>
+</aside>

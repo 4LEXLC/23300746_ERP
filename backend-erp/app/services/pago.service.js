@@ -41,10 +41,37 @@ async function eliminarPago(id) {
   await conexion.promise().query('DELETE FROM pago WHERE id_pago = ?', [id]);
 }
 
+// Total de la venta, para compararlo con el monto del pago.
+async function totalDeVenta(idVenta) {
+  const [filas] = await conexion.promise().query('SELECT total FROM venta WHERE id_venta = ?', [idVenta]);
+  return filas.length ? Number(filas[0].total) : null;
+}
+
+// Una referencia de transacción no se puede usar dos veces.
+async function referenciaUsada(referencia) {
+  const [filas] = await conexion.promise().query('SELECT 1 FROM pago WHERE referencia_transaccion = ?', [referencia]);
+  return filas.length > 0;
+}
+
+// Una venta solo puede tener un pago.
+async function ventaTienePago(idVenta) {
+  const [filas] = await conexion.promise().query('SELECT 1 FROM pago WHERE id_venta = ?', [idVenta]);
+  return filas.length > 0;
+}
+
+// La venta pasa de pendiente a completada solo cuando su pago ya quedó guardado.
+async function completarVenta(idVenta) {
+  await conexion.promise().query("UPDATE venta SET estado = 'completada' WHERE id_venta = ?", [idVenta]);
+}
+
 module.exports = {
   obtenerPagos,
   obtenerPagoPorId,
   crearPago,
   actualizarPago,
   eliminarPago,
+  totalDeVenta,
+  referenciaUsada,
+  ventaTienePago,
+  completarVenta,
 };

@@ -61,3 +61,8 @@ button {
   margin-top: 18px;
   align-items: start;
 }
+
+.acciones-head {
+  display: flex;
+  gap: 8px;
+}

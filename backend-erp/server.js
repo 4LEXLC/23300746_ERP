@@ -4,7 +4,7 @@ require('dotenv').config();
 // Aquí se registran todas las rutas del API (una por cada tabla del negocio).
 const express = require('express');
 const cors = require('cors'); // permite que Angular (otro puerto) pueda hacer peticiones a este servidor
-const { verificarToken } = require('./middleware/auth.middleware');
+const { verificarToken, requiereRol } = require('./middleware/auth.middleware');
 const productoRoutes = require('./routes/producto.routes');
 const usuarioRoutes = require('./routes/usuario.routes');
 const puestoRoutes = require('./routes/puesto.routes');
@@ -26,23 +26,26 @@ const paypalRoutes = require('./routes/paypal.routes');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:4200' }));
 app.use(express.json()); // permite leer el body de las peticiones en formato JSON
 
 // Usuario no lleva verificarToken aquí: el login es público y lo demás se protege dentro de usuario.routes.js
 app.use('/api/usuario', usuarioRoutes);
 
+// Solo el administrador: recursos humanos, proveedores y compras.
+const soloAdmin = [verificarToken, requiereRol('admin')];
+
 // Todas estas rutas piden token válido.
 app.use('/api/producto', verificarToken, productoRoutes);
-app.use('/api/puesto', verificarToken, puestoRoutes);
-app.use('/api/trabajador', verificarToken, trabajadorRoutes);
-app.use('/api/horario', verificarToken, horarioRoutes);
-app.use('/api/asistencia', verificarToken, asistenciaRoutes);
-app.use('/api/permiso', verificarToken, permisoRoutes);
+app.use('/api/puesto', soloAdmin, puestoRoutes);
+app.use('/api/trabajador', soloAdmin, trabajadorRoutes);
+app.use('/api/horario', soloAdmin, horarioRoutes);
+app.use('/api/asistencia', soloAdmin, asistenciaRoutes);
+app.use('/api/permiso', soloAdmin, permisoRoutes);
 app.use('/api/movimiento_inventario', verificarToken, movimientoInventarioRoutes);
-app.use('/api/proveedor', verificarToken, proveedorRoutes);
-app.use('/api/producto_proveedor', verificarToken, productoProveedorRoutes);
-app.use('/api/compra', verificarToken, compraRoutes);
+app.use('/api/proveedor', soloAdmin, proveedorRoutes);
+app.use('/api/producto_proveedor', soloAdmin, productoProveedorRoutes);
+app.use('/api/compra', soloAdmin, compraRoutes);
 app.use('/api/cliente', verificarToken, clienteRoutes);
 app.use('/api/venta', verificarToken, ventaRoutes);
 app.use('/api/ticket', verificarToken, ticketRoutes);

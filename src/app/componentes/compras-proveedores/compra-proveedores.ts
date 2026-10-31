@@ -1,151 +1,104 @@
-// Proveedores, órdenes de compra y recepción de productos contra el backend real.
-import { Component, signal } from '@angular/core';
+// Proveedores, órdenes de compra y recepción de productos.
+import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { DatosProveedor, FormularioProveedor } from './modales/formulario-proveedor/formulario-proveedor';
-import { DatosOrdenCompra, FormularioOrdenCompra, LineaOrdenCompra } from './modales/formulario-orden-compra/formulario-orden-compra';
+import { FormularioProveedor } from './modales/formulario-proveedor/formulario-proveedor';
+import { DetalleOrden } from './modales/detalle-orden/detalle-orden';
+import { DatosOrdenCompra, FormularioOrdenCompra } from './modales/formulario-orden-compra/formulario-orden-compra';
 import { InventarioService } from '../compartidos/servicios/inventario.service';
 import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
-import { API_URL } from '../compartidos/servicios/api.config';
-
-interface Proveedor {
-  id_proveedor?: number;
-  nombre: string;
-  telefono: string;
-  correo: string;
-}
-
-interface OrdenCompra {
-  id_compra?: number;
-  folio: string;
-  fecha: Date;
-  proveedor: string;
-  items: LineaOrdenCompra[];
-  total: number;
-  estado: 'recibida' | 'pendiente';
-}
-
-interface ProveedorBackend {
-  id_proveedor: number;
-  nombre: string;
-  telefono: string | null;
-  correo: string | null;
-  direccion: string | null;
-  estado: string;
-}
-
-interface CompraBackend {
-  id_compra: number;
-  id_proveedor: number;
-  fecha: string;
-  productos: LineaOrdenCompra[] | string;
-  total: string | number;
-  estado: 'recibida' | 'pendiente';
-}
+import { ComprasService, DatosProveedor, OrdenCompra, Proveedor } from '../compartidos/servicios/compras.service';
+import { AvisoService } from '../compartidos/servicios/aviso.service';
 
 @Component({
-  imports: [DatePipe, FormularioProveedor, FormularioOrdenCompra],
+  imports: [DatePipe, FormularioProveedor, FormularioOrdenCompra, DetalleOrden],
   selector: 'app-compra-proveedores',
   styleUrl: './compra-proveedores.css',
   templateUrl: './compra-proveedores.html',
 })
 export class CompraProveedores {
-  private readonly urlProveedor = `${API_URL}/proveedor`;
-  private readonly urlCompra = `${API_URL}/compra`;
-
   constructor(
-    private http: HttpClient,
+    private comprasService: ComprasService,
     private inventarioService: InventarioService,
     private contabilidadService: ContabilidadService,
+    private aviso: AvisoService,
   ) {
-    this.cargarProveedores();
+    this.comprasService.cargar();
   }
 
-  proveedores = signal<Proveedor[]>([]);
-  ordenes = signal<OrdenCompra[]>([]);
+  // Las listas viven en el servicio.
+  get proveedores() {
+    return this.comprasService.proveedores;
+  }
+
+  get ordenesPendientes(): number {
+    return this.ordenes().filter((o) => o.estado === 'pendiente').length;
+  }
+
+  get ordenes() {
+    return this.comprasService.ordenes;
+  }
 
   mostrarFormularioProveedor = false;
   mostrarFormularioOrden = false;
+  ordenDetalle: OrdenCompra | null = null;
+  proveedorEnEdicion: Proveedor | null = null;
+  datosProveedorEdicion: DatosProveedor | null = null;
 
-  private cargarProveedores(): void {
-    this.http.get<ProveedorBackend[]>(this.urlProveedor).subscribe((datos) => {
-      this.proveedores.set(datos.map((p) => ({ id_proveedor: p.id_proveedor, nombre: p.nombre, telefono: p.telefono ?? '—', correo: p.correo ?? '—' })));
-      this.cargarOrdenes();
-    });
-  }
-
-  private cargarOrdenes(): void {
-    this.http.get<CompraBackend[]>(this.urlCompra).subscribe((datos) => {
-      this.ordenes.set(datos.map((c) => this.ordenDesdeBackend(c)));
-    });
-  }
-
-  private ordenDesdeBackend(c: CompraBackend): OrdenCompra {
-    const proveedor = this.proveedores().find((p) => p.id_proveedor === c.id_proveedor);
-    const items = typeof c.productos === 'string' ? JSON.parse(c.productos) : c.productos;
-    return {
-      id_compra: c.id_compra,
-      folio: `OC-${String(c.id_compra).padStart(4, '0')}`,
-      fecha: new Date(c.fecha),
-      proveedor: proveedor?.nombre ?? '—',
-      items: items ?? [],
-      total: Number(c.total),
-      estado: c.estado,
-    };
-  }
-
-  // Obtiene los nombres para el selector de proveedores.
+  // Solo los proveedores activos salen al hacer una orden.
   get nombresProveedores(): string[] {
-    return this.proveedores().map((p) => p.nombre);
+    return this.proveedores().filter((p) => p.estado === 'activo').map((p) => p.nombre);
   }
 
-  // Guarda el proveedor en el backend y cierra el formulario.
-  agregarProveedor(datos: DatosProveedor): void {
-    this.http
-      .post<ProveedorBackend>(this.urlProveedor, {
-        nombre: datos.nombre,
-        telefono: datos.telefono || null,
-        correo: datos.correo || null,
-        direccion: null,
-        estado: 'activo',
-      })
-      .subscribe((creado) => {
-        this.proveedores.update((lista) => [...lista, { id_proveedor: creado.id_proveedor, nombre: creado.nombre, telefono: creado.telefono ?? '—', correo: creado.correo ?? '—' }]);
-      });
+  abrirNuevoProveedor(): void {
+    this.proveedorEnEdicion = null;
+    this.datosProveedorEdicion = null;
+    this.mostrarFormularioProveedor = true;
+  }
+
+  editarProveedor(proveedor: Proveedor): void {
+    this.proveedorEnEdicion = proveedor;
+    this.datosProveedorEdicion = { nombre: proveedor.nombre, telefono: proveedor.telefono, correo: proveedor.correo, notas: proveedor.direccion };
+    this.mostrarFormularioProveedor = true;
+  }
+
+  guardarProveedor(datos: DatosProveedor): void {
+    const peticion = this.proveedorEnEdicion
+      ? this.comprasService.editarProveedor(this.proveedorEnEdicion, datos)
+      : this.comprasService.agregarProveedor(datos);
+    peticion.subscribe({
+      next: () => this.aviso.exito('Proveedor guardado.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo guardar el proveedor.'),
+    });
     this.mostrarFormularioProveedor = false;
   }
 
-  // Calcula el total y guarda la orden de compra en el backend.
+  cambiarEstadoProveedor(proveedor: Proveedor): void {
+    this.comprasService.cambiarEstadoProveedor(proveedor).subscribe({
+      next: (p) => this.aviso.exito(p.estado === 'activo' ? 'Proveedor activado.' : 'Proveedor desactivado.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo cambiar el estado del proveedor.'),
+    });
+  }
+
   agregarOrdenCompra(datos: DatosOrdenCompra): void {
     const proveedor = this.proveedores().find((p) => p.nombre === datos.proveedor);
-    if (!proveedor?.id_proveedor) return;
-    const total = datos.items.reduce((suma, item) => suma + item.cantidad * item.precioUnitario, 0);
-
-    this.http
-      .post<CompraBackend>(this.urlCompra, {
-        id_proveedor: proveedor.id_proveedor,
-        productos: datos.items,
-        total,
-        estado: datos.estado,
-      })
-      .subscribe((creada) => {
-        this.ordenes.update((lista) => [this.ordenDesdeBackend(creada), ...lista]);
-      });
+    if (!proveedor) return;
+    this.comprasService.agregarOrden(proveedor.id_proveedor, datos.items).subscribe({
+      next: () => this.aviso.exito('Orden de compra registrada.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo registrar la orden.'),
+    });
     this.mostrarFormularioOrden = false;
   }
 
   // Recibe la compra una sola vez y registra inventario y egreso.
   marcarRecibida(orden: OrdenCompra): void {
-    if (orden.estado === 'recibida' || !orden.id_compra) return;
-    orden.estado = 'recibida';
-    this.ordenes.update((lista) => [...lista]);
-    this.http.put(`${this.urlCompra}/${orden.id_compra}`, {
-      id_proveedor: this.proveedores().find((p) => p.nombre === orden.proveedor)?.id_proveedor,
-      productos: orden.items,
-      total: orden.total,
-      estado: 'recibida',
-    }).subscribe();
-    this.inventarioService.registrarEntradaPorCompra(orden.items, orden.proveedor);
-    this.contabilidadService.registrarEgreso(`Compra a ${orden.proveedor} (${orden.folio})`, orden.total, 'Insumos y proveedores', orden.id_compra);
+    if (orden.estado === 'recibida') return;
+    this.comprasService.marcarRecibida(orden).subscribe({
+      next: () => {
+        this.inventarioService.registrarEntradaPorCompra(orden.items, orden.proveedor);
+        this.contabilidadService.registrarEgreso(`Compra a ${orden.proveedor} (${orden.folio})`, orden.total, 'Insumos y proveedores', orden.id_compra);
+        this.aviso.exito('Compra recibida y sumada al inventario.');
+      },
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo marcar la compra como recibida.'),
+    });
   }
 }

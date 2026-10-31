@@ -1,5 +1,6 @@
 // Rutas HTTP (GET/POST/PUT/DELETE) para producto.
 const express = require('express');
+const { requiereRol } = require('../middleware/auth.middleware');
 const {
   obtenerProductos,
   obtenerProductoPorId,
@@ -7,6 +8,7 @@ const {
   actualizarProducto,
   eliminarProducto,
 } = require('../app/services/producto.service');
+const { validarProducto } = require('../app/validaciones');
 
 const router = express.Router();
 
@@ -30,7 +32,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requiereRol('admin'), async (req, res) => {
+  const error = validarProducto(req.body);
+  if (error) return res.status(400).json({ mensaje: error });
   try {
     const nuevoProducto = await crearProducto(req.body);
     res.status(201).json(nuevoProducto);
@@ -41,6 +45,8 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  const error = validarProducto(req.body);
+  if (error) return res.status(400).json({ mensaje: error });
   try {
     const productoActualizado = await actualizarProducto(req.params.id, req.body);
     if (!productoActualizado) return res.status(404).json({ mensaje: 'Producto no encontrado.' });
@@ -51,7 +57,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requiereRol('admin'), async (req, res) => {
   try {
     await eliminarProducto(req.params.id);
     res.status(204).send();

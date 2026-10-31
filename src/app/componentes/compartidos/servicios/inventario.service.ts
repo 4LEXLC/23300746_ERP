@@ -2,6 +2,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_URL } from './api.config';
+import { AvisoService } from './aviso.service';
 
 export interface ProductoInventario {
   id_producto?: number;
@@ -10,6 +11,7 @@ export interface ProductoInventario {
   categoria: string;
   precio: number;
   descripcion: string;
+  imagen?: string;
   existencia: number;
   minimo: number;
   estado: 'activo' | 'inactivo';
@@ -44,7 +46,7 @@ export class InventarioService {
 
   movimientos = signal<MovimientoInventario[]>([]);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private aviso: AvisoService) {
     this.cargarProductos();
   }
 
@@ -62,6 +64,7 @@ export class InventarioService {
       categoria: p.categoria,
       precio: Number(p.precio_venta),
       descripcion: p.descripcion,
+      imagen: p.imagen ?? '',
       existencia: p.stock,
       minimo: p.stock_minimo,
       estado: (p.activo === true || p.activo === 1) ? 'activo' : 'inactivo',
@@ -76,15 +79,19 @@ export class InventarioService {
       precio_venta: producto.precio,
       stock: producto.existencia,
       stock_minimo: producto.minimo,
-      imagen: null,
+      imagen: producto.imagen || null,
       activo: producto.estado === 'activo',
     };
   }
 
   // Agrega un producto en el backend y lo refleja en la lista local.
   agregarProducto(producto: Omit<ProductoInventario, 'sku'>): void {
-    this.http.post<ProductoBackend>(this.apiUrl, this.aBackend(producto)).subscribe((creado) => {
-      this.productos.update((lista) => [...lista, this.aFrontend(creado)]);
+    this.http.post<ProductoBackend>(this.apiUrl, this.aBackend(producto)).subscribe({
+      next: (creado) => {
+        this.productos.update((lista) => [...lista, this.aFrontend(creado)]);
+        this.aviso.exito('Producto agregado.');
+      },
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo agregar el producto.'),
     });
   }
 
@@ -92,8 +99,12 @@ export class InventarioService {
   editarProducto(sku: string, cambios: Omit<ProductoInventario, 'sku'>): void {
     const actual = this.productos().find((p) => p.sku === sku);
     if (!actual?.id_producto) return;
-    this.http.put<ProductoBackend>(`${this.apiUrl}/${actual.id_producto}`, this.aBackend(cambios)).subscribe((actualizado) => {
-      this.productos.update((lista) => lista.map((p) => (p.sku === sku ? this.aFrontend(actualizado) : p)));
+    this.http.put<ProductoBackend>(`${this.apiUrl}/${actual.id_producto}`, this.aBackend(cambios)).subscribe({
+      next: (actualizado) => {
+        this.productos.update((lista) => lista.map((p) => (p.sku === sku ? this.aFrontend(actualizado) : p)));
+        this.aviso.exito('Producto actualizado.');
+      },
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo actualizar el producto.'),
     });
   }
 

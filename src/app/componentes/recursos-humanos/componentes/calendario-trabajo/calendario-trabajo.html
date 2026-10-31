@@ -1,0 +1,28 @@
+<!-- Calendario semanal de trabajo. -->
+<section class="calendario">
+  <h3>Calendario de trabajo</h3>
+  <section class="table-scroll" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th>Trabajador</th>
+          @for (dia of dias; track dia) {
+            <th>{{ dia }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of activos; track t.id_trabajador) {
+          <tr>
+            <td>{{ t.nombre }}</td>
+            @for (dia of dias; track dia; let i = $index) {
+              <td [class.turno]="trabaja(t, i)">{{ trabaja(t, i) ? t.horaEntrada + '–' + t.horaSalida : '—' }}</td>
+            }
+          </tr>
+        } @empty {
+          <tr><td [attr.colspan]="dias.length + 1">No hay trabajadores activos.</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</section>

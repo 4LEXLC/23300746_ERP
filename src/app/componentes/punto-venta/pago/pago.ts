@@ -69,8 +69,9 @@ export class Pago {
             const resultado = await firstValueFrom(this.paypalService.capturarOrden(data.orderId));
             await firstValueFrom(this.carritoService.procesarPago(resultado.captureId));
             this.router.navigateByUrl('/ticket');
-          } catch {
-            this.mensajePago.set('El pago quedó pendiente de verificación. No se registró la venta.');
+          } catch (e) {
+            const mensaje = (e as { error?: { mensaje?: string } } | undefined)?.error?.mensaje;
+            this.mensajePago.set(mensaje ?? 'El pago quedó pendiente de verificación. No se registró la venta.');
             this.procesandoPago.set(false);
           }
         },
@@ -121,9 +122,15 @@ export class Pago {
     if (this.procesandoPago()) return;
     this.procesandoPago.set(true);
 
-    this.carritoService.procesarPago().subscribe(() => {
-      this.procesandoPago.set(false);
-      this.router.navigateByUrl('/ticket');
+    this.carritoService.procesarPago().subscribe({
+      next: () => {
+        this.procesandoPago.set(false);
+        this.router.navigateByUrl('/ticket');
+      },
+      error: (e) => {
+        this.procesandoPago.set(false);
+        this.mensajePago.set(e.error?.mensaje ?? 'No se pudo registrar la venta.');
+      },
     });
   }
 }

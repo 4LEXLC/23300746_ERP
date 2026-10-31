@@ -10,11 +10,17 @@ export interface PagoNomina {
 
 export interface Trabajador {
   id_trabajador?: number;
+  id_usuario?: number | null;
   id_puesto?: number;
   nombre: string;
+  telefono?: string;
   correo: string;
   puesto: string;
   salario: number;
+  fechaContratacion?: string;
+  dias?: string;
+  horaEntrada?: string;
+  horaSalida?: string;
   horario: string;
   estado: 'activo' | 'baja';
 }
@@ -44,4 +50,16 @@ export function iniciales(nombre: string): string {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+}
+
+export interface DatosTrabajador {
+  nombre: string;
+  telefono: string;
+  correo: string;
+  puesto: string;
+  salario: number;
+  fechaContratacion: string;
+  dias: string;
+  horaEntrada: string;
+  horaSalida: string;
 }

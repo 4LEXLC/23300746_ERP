@@ -1,0 +1,4 @@
+<!-- Aviso flotante de confirmación o error. -->
+@if (avisoService.aviso(); as aviso) {
+  <p class="aviso" [class.error]="aviso.tipo === 'error'" role="status">{{ aviso.texto }}</p>
+}

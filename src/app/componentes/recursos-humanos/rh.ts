@@ -1,86 +1,86 @@
-// Recursos Humanos: solo consulta de trabajadores.
-import { Component, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+// Recursos Humanos: alta, edición, baja, horarios, calendario y nómina.
+import { Component } from '@angular/core';
 import { TablaTrabajadores } from './componentes/tabla-trabajadores/tabla-trabajadores';
 import { TablaNomina } from './componentes/tabla-nomina/tabla-nomina';
+import { CalendarioTrabajo } from './componentes/calendario-trabajo/calendario-trabajo';
 import { DatosPagoSalario, FormularioPagoSalario } from './modales/formulario-pago-salario/formulario-pago-salario';
-import { PagoNomina, Trabajador } from './rh.models';
-import { API_URL } from '../compartidos/servicios/api.config';
+import { FormularioTrabajador } from './modales/formulario-trabajador/formulario-trabajador';
+import { DatosTrabajador, PagoNomina, Trabajador } from './rh.models';
 import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
-
-interface TrabajadorBackend {
-  id_trabajador: number;
-  id_puesto: number | null;
-  puesto: string | null;
-  nombre: string;
-  correo: string | null;
-  salario: string | number;
-  estado: 'activo' | 'baja';
-  dia: string | null;
-  hora_entrada: string | null;
-  hora_salida: string | null;
-}
+import { RhService } from '../compartidos/servicios/rh.service';
+import { AvisoService } from '../compartidos/servicios/aviso.service';
 
 @Component({
-  imports: [TablaTrabajadores, TablaNomina, FormularioPagoSalario],
+  imports: [TablaTrabajadores, TablaNomina, CalendarioTrabajo, FormularioPagoSalario, FormularioTrabajador],
   selector: 'app-rh',
   styleUrl: './rh.css',
   templateUrl: './rh.html',
 })
 export class RH {
-  private readonly urlTrabajador = `${API_URL}/trabajador`;
-
   constructor(
-    private http: HttpClient,
+    private rhService: RhService,
     private contabilidadService: ContabilidadService,
+    private aviso: AvisoService,
   ) {
-    this.cargarTrabajadores();
+    this.rhService.cargar();
+    this.contabilidadService.cargar();
   }
 
-  trabajadores = signal<Trabajador[]>([]);
-  mostrarFormularioPago = false;
+  // La lista vive en el servicio.
+  get trabajadores() {
+    return this.rhService.trabajadores;
+  }
 
-  private cargarTrabajadores(): void {
-    this.http.get<TrabajadorBackend[]>(this.urlTrabajador).subscribe((datos) => {
-      this.trabajadores.set(datos.map((t) => this.trabajadorAFrontend(t)));
+  mostrarFormularioPago = false;
+  mostrarFormularioTrabajador = false;
+  trabajadorEnEdicion: Trabajador | null = null;
+
+  abrirNuevo(): void {
+    this.trabajadorEnEdicion = null;
+    this.mostrarFormularioTrabajador = true;
+  }
+
+  editar(trabajador: Trabajador): void {
+    this.trabajadorEnEdicion = trabajador;
+    this.mostrarFormularioTrabajador = true;
+  }
+
+  // Datos, puesto, salario y horario.
+  guardarTrabajador(datos: DatosTrabajador): void {
+    const peticion = this.trabajadorEnEdicion
+      ? this.rhService.editar(this.trabajadorEnEdicion, datos)
+      : this.rhService.agregar(datos);
+    peticion.subscribe({
+      next: () => this.aviso.exito('Trabajador guardado.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo guardar el trabajador.'),
+    });
+    this.mostrarFormularioTrabajador = false;
+    this.trabajadorEnEdicion = null;
+  }
+
+  cambiarEstado(trabajador: Trabajador): void {
+    this.rhService.cambiarEstado(trabajador).subscribe({
+      next: (t) => this.aviso.exito(t.estado === 'baja' ? 'Trabajador dado de baja.' : 'Trabajador reactivado.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo cambiar el estado.'),
     });
   }
 
-  private trabajadorAFrontend(t: TrabajadorBackend): Trabajador {
-    const horario = t.dia ? `${t.dia} · ${(t.hora_entrada ?? '').slice(0, 5)}-${(t.hora_salida ?? '').slice(0, 5)}` : '—';
-    return {
-      id_trabajador: t.id_trabajador,
-      id_puesto: t.id_puesto ?? undefined,
-      nombre: t.nombre,
-      correo: t.correo || '—',
-      puesto: t.puesto || '—',
-      salario: Number(t.salario),
-      horario,
-      estado: t.estado,
-    };
-  }
-
-  // Cuenta los trabajadores activos.
   get activos(): number {
     return this.trabajadores().filter((t) => t.estado === 'activo').length;
   }
 
-  // Cuenta los trabajadores dados de baja.
   get bajas(): number {
     return this.trabajadores().filter((t) => t.estado === 'baja').length;
   }
 
-  // Nombres de los trabajadores activos que pueden recibir pago.
   get nombresActivos(): string[] {
     return this.trabajadores().filter((t) => t.estado === 'activo').map((t) => t.nombre);
   }
 
-  // Salario registrado de cada trabajador activo, para sugerir el monto.
   get salarios(): Record<string, number> {
     return Object.fromEntries(this.trabajadores().map((t) => [t.nombre, t.salario]));
   }
 
-  // Pagos de nómina registrados como egresos de categoría Nómina.
   get pagosNomina(): PagoNomina[] {
     return this.contabilidadService
       .movimientos()
@@ -99,7 +99,6 @@ export class RH {
       });
   }
 
-  // Registra el pago como egreso de Nómina en contabilidad.
   registrarPago(datos: DatosPagoSalario): void {
     if (!datos.trabajador || datos.monto <= 0 || datos.periodoFin < datos.periodoInicio) return;
     this.contabilidadService.registrarEgreso(
@@ -107,6 +106,7 @@ export class RH {
       datos.monto,
       'Nómina',
     );
+    this.aviso.exito('Pago de nómina registrado.');
     this.mostrarFormularioPago = false;
   }
 }

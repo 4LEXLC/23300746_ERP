@@ -1,7 +1,7 @@
 <!-- Captura y edición de productos. -->
 <aside class="overlay" (click)="cerrar.emit()">
   <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
-  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+  <form class="modal" #f="ngForm" (click)="$event.stopPropagation()" (ngSubmit)="f.valid && onGuardar()">
     <header class="modal-head">
       <hgroup>
         <h3>{{ editando ? 'Editar producto' : 'Agregar producto' }}</h3>
@@ -15,13 +15,17 @@
     <section class="modal-body">
       <section class="field">
         <label for="p-nombre">Nombre del producto <span class="req">*</span></label>
-        <input id="p-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Producto nuevo" required />
+        <input id="p-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" #nombre="ngModel"
+               placeholder="Ej. Producto nuevo" required minlength="2" maxlength="100" />
+        @if (nombre.invalid && (nombre.touched || f.submitted)) {
+          <small class="error">El nombre debe tener entre 2 y 100 caracteres.</small>
+        }
       </section>
 
       <section class="field-row">
         <section class="field">
           <label for="p-categoria">Categoría <span class="req">*</span></label>
-          <select id="p-categoria" class="box" name="categoria" [(ngModel)]="datos.categoria">
+          <select id="p-categoria" class="box" name="categoria" [(ngModel)]="datos.categoria" required>
             @for (categoria of categorias; track categoria) {
               <option [value]="categoria">{{ categoria }}</option>
             }
@@ -29,7 +33,11 @@
         </section>
         <section class="field">
           <label for="p-precio">Precio de venta <span class="req">*</span></label>
-          <input id="p-precio" class="box" type="number" min="0" step="0.01" name="precio" [(ngModel)]="datos.precio" />
+          <input id="p-precio" class="box" type="number" min="0.01" step="0.01" name="precio"
+                 [(ngModel)]="datos.precio" #precio="ngModel" required />
+          @if (precio.invalid && (precio.touched || f.submitted)) {
+            <small class="error">El precio debe ser mayor que cero.</small>
+          }
         </section>
       </section>
 
@@ -38,14 +46,32 @@
         <textarea id="p-desc" class="box" name="descripcion" [(ngModel)]="datos.descripcion" placeholder="Descripción breve del producto"></textarea>
       </section>
 
+      <!-- Imagen del producto por URL. -->
+      <section class="field">
+        <label for="p-imagen">URL de la imagen</label>
+        <input id="p-imagen" class="box" type="url" name="imagen" [(ngModel)]="datos.imagen" #imagen="ngModel"
+               placeholder="https://..." pattern="https?://.+" />
+        @if (imagen.invalid && (imagen.touched || f.submitted)) {
+          <small class="error">La URL debe empezar con http:// o https://</small>
+        }
+      </section>
+
       <section class="field-row3">
         <section class="field">
-          <label for="p-exist">Existencia inicial</label>
-          <input id="p-exist" class="box" type="number" min="0" name="existencia" [(ngModel)]="datos.existencia" />
+          <label for="p-exist">Existencia inicial <span class="req">*</span></label>
+          <input id="p-exist" class="box" type="number" min="0" step="1" name="existencia"
+                 [(ngModel)]="datos.existencia" #existencia="ngModel" required pattern="[0-9]+" />
+          @if (existencia.invalid && (existencia.touched || f.submitted)) {
+            <small class="error">Número entero, 0 o mayor.</small>
+          }
         </section>
         <section class="field">
-          <label for="p-min">Existencia mínima</label>
-          <input id="p-min" class="box" type="number" min="0" name="minimo" [(ngModel)]="datos.minimo" />
+          <label for="p-min">Existencia mínima <span class="req">*</span></label>
+          <input id="p-min" class="box" type="number" min="0" step="1" name="minimo"
+                 [(ngModel)]="datos.minimo" #minimo="ngModel" required pattern="[0-9]+" />
+          @if (minimo.invalid && (minimo.touched || f.submitted)) {
+            <small class="error">Número entero, 0 o mayor.</small>
+          }
         </section>
         <section class="field">
           <label for="p-estado">Estado</label>

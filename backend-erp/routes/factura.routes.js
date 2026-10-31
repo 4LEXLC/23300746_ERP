@@ -1,5 +1,6 @@
 // Rutas HTTP (GET/POST/PUT/DELETE) para factura.
 const express = require('express');
+const { requiereRol } = require('../middleware/auth.middleware');
 const { generarXmlFactura } = require('../app/services/xml-factura.service');
 const { enviarFactura } = require('../app/services/correo.service');
 
@@ -8,7 +9,10 @@ const {
   obtenerFacturaPorId,
   crearFactura,
   actualizarFactura,
-  eliminarFactura,
+  cancelarFactura,
+  pagoAprobado,
+  tieneFacturaVigente,
+  ESTADOS_FACTURA,
 } = require('../app/services/factura.service');
 
 const router = express.Router();
@@ -31,7 +35,7 @@ async function mandarFacturaPorCorreo(id_factura) {
   }
 }
 
-router.get('/', async (req, res) => {
+router.get('/', requiereRol('admin'), async (req, res) => {
   try {
     res.json(await obtenerFacturas());
   } catch (error) {
@@ -40,7 +44,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requiereRol('admin'), async (req, res) => {
   try {
     const registro = await obtenerFacturaPorId(req.params.id);
     if (!registro) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -53,16 +57,38 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    if (!(await pagoAprobado(req.body.id_venta))) {
+      return res.status(400).json({ mensaje: 'Solo se puede facturar una venta con pago aprobado.' });
+    }
+    if (await tieneFacturaVigente(req.body.id_venta)) {
+      return res.status(400).json({ mensaje: 'Esta venta ya tiene una factura vigente.' });
+    }
     const nuevoRegistro = await crearFactura(req.body);
     res.status(201).json(nuevoRegistro);
-    mandarFacturaPorCorreo(nuevoRegistro.id_factura)
+    mandarFacturaPorCorreo(nuevoRegistro.id_factura);
   } catch (error) {
     console.error('Error al crear el registro:', error);
     res.status(500).json({ mensaje: 'No se pudo crear el registro.' });
   }
 });
 
-router.put('/:id', async (req, res) => {
+// Cancela sin borrar.
+router.patch('/:id/cancelar', requiereRol('admin'), async (req, res) => {
+  try {
+    const factura = await cancelarFactura(req.params.id);
+    if (!factura) return res.status(404).json({ mensaje: 'Factura no encontrada.' });
+    res.json(factura);
+  } catch (error) {
+    console.error('Error al cancelar la factura:', error);
+    res.status(500).json({ mensaje: 'No se pudo cancelar la factura.' });
+  }
+});
+
+// El estado solo puede tener valores permitidos.
+router.put('/:id', requiereRol('admin'), async (req, res) => {
+  if (!ESTADOS_FACTURA.includes(req.body.estado)) {
+    return res.status(400).json({ mensaje: 'Estado de factura no permitido.' });
+  }
   try {
     const registroActualizado = await actualizarFactura(req.params.id, req.body);
     if (!registroActualizado) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -70,16 +96,6 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar el registro:', error);
     res.status(500).json({ mensaje: 'No se pudo actualizar el registro.' });
-  }
-});
-
-router.delete('/:id', async (req, res) => {
-  try {
-    await eliminarFactura(req.params.id);
-    res.status(204).send();
-  } catch (error) {
-    console.error('Error al eliminar el registro:', error);
-    res.status(500).json({ mensaje: 'No se pudo eliminar el registro.' });
   }
 });
 

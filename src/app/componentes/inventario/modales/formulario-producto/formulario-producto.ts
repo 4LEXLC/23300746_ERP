@@ -7,6 +7,7 @@ export interface DatosProducto {
   categoria: string;
   precio: number;
   descripcion: string;
+  imagen?: string;
   existencia: number;
   minimo: number;
   estado: 'activo' | 'inactivo';
@@ -20,10 +21,9 @@ export interface DatosProducto {
 })
 export class FormularioProducto {
   // Copia el producto para editarlo desde el formulario.
-  // Recibe datos del componente padre o le comunica acciones.
   @Input() set productoEditar(producto: DatosProducto | null) {
     if (producto) {
-      this.datos = { ...producto };
+      this.datos = { ...producto, imagen: producto.imagen ?? '' };
       this.editando = true;
     }
   }
@@ -38,13 +38,13 @@ export class FormularioProducto {
     categoria: this.categorias[0],
     precio: 0,
     descripcion: '',
+    imagen: '',
     existencia: 0,
     minimo: 0,
     estado: 'activo',
   };
 
-  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
-    this.guardar.emit(this.datos);
+    this.guardar.emit({ ...this.datos, nombre: this.datos.nombre.trim() });
   }
 }

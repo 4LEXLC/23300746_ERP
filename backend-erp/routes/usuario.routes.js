@@ -9,7 +9,9 @@ const {
   actualizarUsuario,
   eliminarUsuario,
   loginUsuario,
+  nombreUsuarioOcupado,
 } = require('../app/services/usuario.service');
+const { validarUsuario } = require('../app/validaciones');
 
 const router = express.Router();
 
@@ -52,6 +54,12 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    const error = validarUsuario(req.body, true);
+    if (error) return res.status(400).json({ mensaje: error });
+    // Nombre de usuario único.
+    if (await nombreUsuarioOcupado(req.body.nombre_usuario)) {
+      return res.status(409).json({ mensaje: 'Ese nombre de usuario ya existe.' });
+    }
     const nuevoRegistro = await crearUsuario(req.body);
     res.status(201).json(nuevoRegistro);
   } catch (error) {
@@ -62,6 +70,11 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
+    const error = validarUsuario(req.body, false);
+    if (error) return res.status(400).json({ mensaje: error });
+    if (await nombreUsuarioOcupado(req.body.nombre_usuario, req.params.id)) {
+      return res.status(409).json({ mensaje: 'Ese nombre de usuario ya existe.' });
+    }
     const registroActualizado = await actualizarUsuario(req.params.id, req.body);
     if (!registroActualizado) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
     res.json(registroActualizado);
@@ -72,12 +85,15 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  if (Number(req.params.id) === req.usuario.id_usuario) {
+    return res.status(400).json({ mensaje: 'No puedes eliminar tu propia cuenta.' });
+  }
   try {
     await eliminarUsuario(req.params.id);
     res.status(204).send();
   } catch (error) {
-    console.error('Error al eliminar el registro:', error);
-    res.status(500).json({ mensaje: 'No se pudo eliminar el registro.' });
+    console.error('Error al eliminar el usuario:', error);
+    res.status(500).json({ mensaje: 'No se pudo eliminar el usuario.' });
   }
 });
 

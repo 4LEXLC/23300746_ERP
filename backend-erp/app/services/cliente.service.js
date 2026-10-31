@@ -21,6 +21,12 @@ async function obtenerClientePorId(id) {
   return filas.length ? mapFila(filas[0]) : null;
 }
 
+// Busca si el RFC ya está registrado.
+async function obtenerClientePorRfc(rfc) {
+  const [filas] = await conexion.promise().query(`SELECT ${COLUMNAS} FROM cliente WHERE rfc = ?`, [rfc]);
+  return filas.length ? mapFila(filas[0]) : null;
+}
+
 async function crearCliente(datos) {
   const [resultado] = await conexion.promise().query(
     'INSERT INTO cliente (nombre, razon_social, rfc, correo, codigo_postal, regimen_fiscal) VALUES (?, ?, ?, ?, ?, ?)',
@@ -44,6 +50,7 @@ async function eliminarCliente(id) {
 module.exports = {
   obtenerClientes,
   obtenerClientePorId,
+  obtenerClientePorRfc,
   crearCliente,
   actualizarCliente,
   eliminarCliente,

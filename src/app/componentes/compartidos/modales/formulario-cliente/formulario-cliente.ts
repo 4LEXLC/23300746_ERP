@@ -1,14 +1,7 @@
-// Captura de datos del cliente para facturación.
-import { Component, EventEmitter, Output } from '@angular/core';
+// Captura y edición de los datos fiscales del cliente.
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-export interface DatosCliente {
-  nombre: string;
-  rfc: string;
-  codigoPostal: string;
-  regimenFiscal: string;
-  correo: string;
-}
+import { DatosCliente } from '../../servicios/ventas.service';
 
 @Component({
   selector: 'app-formulario-cliente',
@@ -17,11 +10,18 @@ export interface DatosCliente {
   styleUrl: './formulario-cliente.css',
 })
 export class FormularioCliente {
-  // Recibe datos del componente padre o le comunica acciones.
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosCliente>();
 
   regimenes = ['General de Ley Personas Morales', 'Régimen de Incorporación Fiscal', 'Sueldos y Salarios'];
+  editando = false;
+
+  // Carga los datos cuando se abre para editar.
+  @Input() set clienteEditar(cliente: DatosCliente | null) {
+    if (!cliente) return;
+    this.datos = { ...cliente };
+    this.editando = true;
+  }
 
   datos: DatosCliente = {
     nombre: '',
@@ -31,8 +31,7 @@ export class FormularioCliente {
     correo: '',
   };
 
-  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
-    this.guardar.emit(this.datos);
+    this.guardar.emit({ ...this.datos, rfc: this.datos.rfc.trim().toUpperCase() });
   }
 }

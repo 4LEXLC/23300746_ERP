@@ -345,3 +345,22 @@ tbody tr:last-child td {
   color: var(--text-muted);
   font-size: 11.5px;
 }
+
+.prov.inactivo {
+  opacity: 0.55;
+}
+
+.prov-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.link-btn {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}

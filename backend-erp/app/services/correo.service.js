@@ -26,7 +26,7 @@ async function enviarConfirmacionPago({ para, nombre, monto, captureId, orderId 
     asunto: 'Confirmación de pago - Cafetería ERP',
     html,
   });
-} // ← esta llave es la que te faltaba
+}
 
 // Correo con la factura: lleva el XML como archivo adjunto.
 async function enviarFactura({ para, nombre, folio, total, xml, nombreArchivo }) {

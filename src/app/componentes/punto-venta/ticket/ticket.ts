@@ -4,8 +4,9 @@ import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CarritoService } from '../../compartidos/servicios/carrito.service';
 
-import { DatosCliente, FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';
-import { VentasService } from '../../compartidos/servicios/ventas.service';
+import { FormularioCliente } from '../../compartidos/modales/formulario-cliente/formulario-cliente';
+import { AuthService } from '../../compartidos/servicios/auth.service';
+import { DatosCliente, VentasService } from '../../compartidos/servicios/ventas.service';
 
 @Component({
   imports: [RouterLink, DatePipe, FormularioCliente],
@@ -18,6 +19,7 @@ export class Ticket {
     public carritoService: CarritoService,
     private ventasService: VentasService,
     private router: Router,
+    public authService: AuthService,
   ) {}
 
   mostrarFormularioCliente = false;

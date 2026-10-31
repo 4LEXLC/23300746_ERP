@@ -1,19 +1,7 @@
-// Captura y edición de trabajadores.
+// Alta y edición de trabajadores.
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Trabajador } from '../../rh.models';
-
-export interface DatosTrabajador {
-  nombre: string;
-  telefono: string;
-  correo: string;
-  puesto: string;
-  salario: number;
-  fechaContratacion: string;
-  dias: string;
-  horaEntrada: string;
-  horaSalida: string;
-}
+import { DatosTrabajador, Trabajador } from '../../rh.models';
 
 @Component({
   selector: 'app-formulario-trabajador',
@@ -22,7 +10,6 @@ export interface DatosTrabajador {
   styleUrl: './formulario-trabajador.css',
 })
 export class FormularioTrabajador {
-  // Recibe datos del componente padre o le comunica acciones.
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosTrabajador>();
 
@@ -30,22 +17,21 @@ export class FormularioTrabajador {
   diasDisponibles = ['Lun–Vie', 'Mar–Sáb', 'Mié–Dom', 'Sáb–Dom'];
 
   editando = false;
+  errorHorario = '';
 
-  // Separa el horario y carga los datos del trabajador.
-  @Input() set trabajadorEditar(trabajador: Trabajador | null) {
-    if (!trabajador) return;
-    const [dias, horas] = trabajador.horario.split(' · ');
-    const [horaEntrada, horaSalida] = (horas ?? '').split('-');
+  // Carga los datos del trabajador cuando se abre para editar.
+  @Input() set trabajadorEditar(t: Trabajador | null) {
+    if (!t) return;
     this.datos = {
-      nombre: trabajador.nombre,
-      telefono: '',
-      correo: trabajador.correo === '—' ? '' : trabajador.correo,
-      puesto: trabajador.puesto,
-      salario: trabajador.salario,
-      fechaContratacion: '',
-      dias: this.diasDisponibles.includes(dias) ? dias : this.diasDisponibles[0],
-      horaEntrada: horaEntrada || '08:00',
-      horaSalida: horaSalida || '16:00',
+      nombre: t.nombre,
+      telefono: t.telefono ?? '',
+      correo: t.correo === '—' ? '' : t.correo,
+      puesto: t.puesto,
+      salario: t.salario,
+      fechaContratacion: t.fechaContratacion ?? '',
+      dias: t.dias && this.diasDisponibles.includes(t.dias) ? t.dias : this.diasDisponibles[0],
+      horaEntrada: t.horaEntrada || '08:00',
+      horaSalida: t.horaSalida || '16:00',
     };
     this.editando = true;
   }
@@ -62,8 +48,13 @@ export class FormularioTrabajador {
     horaSalida: '16:00',
   };
 
-  // Envía los datos al componente que abrió el formulario.
+  // La salida tiene que ser después de la entrada.
   onGuardar(): void {
-    this.guardar.emit(this.datos);
+    if (this.datos.horaSalida <= this.datos.horaEntrada) {
+      this.errorHorario = 'La hora de salida debe ser posterior a la de entrada.';
+      return;
+    }
+    this.errorHorario = '';
+    this.guardar.emit({ ...this.datos, nombre: this.datos.nombre.trim() });
   }
 }

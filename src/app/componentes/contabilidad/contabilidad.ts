@@ -19,6 +19,7 @@ export class Contabilidad {
   hasta = '';
 
   constructor(public contabilidadService: ContabilidadService) {
+    this.contabilidadService.cargar();
     this.contabilidadService.establecerPeriodo(this.periodoActivo);
   }
 
@@ -77,7 +78,9 @@ export class Contabilidad {
   exportarExcel(): void {
     const encabezados = ['Fecha', 'Concepto', 'Tipo', 'Monto'];
     const filas = this.movimientos.map((m) => [m.fecha, m.concepto, m.tipo, m.monto.toFixed(2)]);
-    const csv = [encabezados, ...filas].map((fila) => fila.join(',')).join('\n');
+    // Se escapan comillas y comas, y el BOM hace que Excel lea bien los acentos.
+    const celda = (valor: string) => `"${String(valor).replace(/"/g, '""')}"`;
+    const csv = '\uFEFF' + [encabezados, ...filas].map((fila) => fila.map(celda).join(',')).join('\r\n');
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

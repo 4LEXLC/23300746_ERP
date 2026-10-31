@@ -1,11 +1,10 @@
-<!-- Captura de datos del proveedor. -->
+<!-- Captura y edición de proveedores. -->
 <aside class="overlay" (click)="cerrar.emit()">
-  <!-- Evita cerrar el modal al hacer clic dentro del formulario. -->
-  <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="onGuardar()">
+  <form class="modal" #f="ngForm" (click)="$event.stopPropagation()" (ngSubmit)="f.valid && onGuardar()">
     <header class="modal-head">
       <hgroup>
-        <h3>Agregar proveedor</h3>
-        <p>Registra un nuevo proveedor para tus compras</p>
+        <h3>{{ editando ? 'Editar proveedor' : 'Agregar proveedor' }}</h3>
+        <p>{{ editando ? 'Actualiza los datos de contacto' : 'Registra un nuevo proveedor para tus compras' }}</p>
       </hgroup>
       <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
@@ -15,16 +14,28 @@
     <section class="modal-body">
       <section class="field">
         <label for="pr-nombre">Nombre del proveedor <span class="req">*</span></label>
-        <input id="pr-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" placeholder="Ej. Proveedor nuevo" required />
+        <input id="pr-nombre" class="box" type="text" name="nombre" [(ngModel)]="datos.nombre" #nombre="ngModel"
+               placeholder="Ej. Proveedor nuevo" required />
+        @if (nombre.invalid && (nombre.touched || f.submitted)) {
+          <small class="error">El nombre del proveedor es obligatorio.</small>
+        }
       </section>
       <section class="field-row">
         <section class="field">
           <label for="pr-tel">Teléfono <span class="req">*</span></label>
-          <input id="pr-tel" class="box" type="tel" name="telefono" [(ngModel)]="datos.telefono" placeholder="33 0000 0000" />
+          <input id="pr-tel" class="box" type="tel" name="telefono" [(ngModel)]="datos.telefono" #tel="ngModel"
+                 placeholder="33 1234 5678" required pattern="[0-9]{2} ?[0-9]{4} ?[0-9]{4}" />
+          @if (tel.invalid && (tel.touched || f.submitted)) {
+            <small class="error">10 dígitos, por ejemplo 33 1234 5678.</small>
+          }
         </section>
         <section class="field">
           <label for="pr-correo">Correo electrónico</label>
-          <input id="pr-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" placeholder="contacto@proveedor.mx" />
+          <input id="pr-correo" class="box" type="email" name="correo" [(ngModel)]="datos.correo" #correo="ngModel"
+                 placeholder="contacto@proveedor.mx" email />
+          @if (correo.invalid && (correo.touched || f.submitted)) {
+            <small class="error">Escribe un correo válido.</small>
+          }
         </section>
       </section>
       <section class="field">
@@ -36,7 +47,7 @@
     <footer class="modal-foot">
       <button type="button" class="btn btn-sec" (click)="cerrar.emit()">Cancelar</button>
       <button type="submit" class="btn btn-pri">
-        Guardar proveedor
+        {{ editando ? 'Guardar cambios' : 'Guardar proveedor' }}
         <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
       </button>
     </footer>

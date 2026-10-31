@@ -23,6 +23,11 @@ export class PuntoVenta {
     public authService: AuthService,
   ) {}
 
+  // Solo el administrador ve el menú lateral.
+  get esAdmin(): boolean {
+    return this.authService.obtenerRol() === 'admin';
+  }
+
   errorConfirmacion = '';
 
   categoriaActiva = 'Todos';
@@ -42,6 +47,7 @@ export class PuntoVenta {
         nombre: p.nombre,
         categoria: p.categoria,
         precio: p.precio,
+        imagen: p.imagen,
         icono: p.categoria === 'Repostería' || p.categoria === 'Alimentos' ? 'reposteria' : 'bebida',
       }));
   }

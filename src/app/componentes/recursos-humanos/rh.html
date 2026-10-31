@@ -1,16 +1,29 @@
-<!-- Recursos Humanos: solo consulta de información (sin altas, bajas ni ediciones). -->
+<!-- Recursos Humanos: alta, edición, baja, horarios, calendario y nómina. -->
 <header class="page-head">
   <hgroup>
     <h1>Recursos Humanos</h1>
     <p>{{ activos }} trabajadores activos · {{ bajas }} baja(s)</p>
   </hgroup>
-  <button type="button" class="add-btn" (click)="mostrarFormularioPago = true">Pagar nómina</button>
+  <span class="acciones-head">
+    <button type="button" class="add-btn" (click)="abrirNuevo()">Agregar trabajador</button>
+    <button type="button" class="add-btn" (click)="mostrarFormularioPago = true">Pagar nómina</button>
+  </span>
 </header>
 
 <section class="layout">
-  <app-tabla-trabajadores [trabajadores]="trabajadores()" />
+  <app-tabla-trabajadores [trabajadores]="trabajadores()" (editar)="editar($event)" (cambiarEstado)="cambiarEstado($event)" />
   <app-tabla-nomina [pagos]="pagosNomina" />
 </section>
+
+<app-calendario-trabajo [trabajadores]="trabajadores()" />
+
+@if (mostrarFormularioTrabajador) {
+  <app-formulario-trabajador
+    [trabajadorEditar]="trabajadorEnEdicion"
+    (cerrar)="mostrarFormularioTrabajador = false"
+    (guardar)="guardarTrabajador($event)"
+  />
+}
 
 @if (mostrarFormularioPago) {
   <app-formulario-pago-salario

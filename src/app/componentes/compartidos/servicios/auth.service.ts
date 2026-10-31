@@ -74,6 +74,8 @@ export class AuthService {
   }
 
   get rolMostrado(): string {
-    return this.leer('rol') ?? 'Sin rol asignado';
+    const etiquetas: Record<string, string> = { admin: 'Administrador', cajero: 'Cajero' };
+    const rol = this.leer('rol');
+    return rol ? (etiquetas[rol] ?? rol) : 'Sin rol asignado';
   }
 }

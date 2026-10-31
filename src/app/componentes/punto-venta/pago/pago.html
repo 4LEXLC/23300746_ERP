@@ -84,7 +84,7 @@
         <p class="gateway-status">Conectando con la pasarela de pago…</p>
       }
       @if (mensajePago()) {
-        <p class="gateway-status">{{ mensajePago() }}</p>
+        <p class="gateway-status rechazo" role="alert">{{ mensajePago() }}</p>
       }
       @if (carritoService.metodoPago === 'tarjeta') {
         @if (paypalListo() && carritoService.items.length && aceptaTerminos()) {

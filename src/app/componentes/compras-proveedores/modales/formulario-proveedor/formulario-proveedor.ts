@@ -1,13 +1,7 @@
-// Captura de datos del proveedor.
-import { Component, EventEmitter, Output } from '@angular/core';
+// Captura y edición de proveedores.
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-export interface DatosProveedor {
-  nombre: string;
-  telefono: string;
-  correo: string;
-  notas: string;
-}
+import { DatosProveedor } from '../../../compartidos/servicios/compras.service';
 
 @Component({
   selector: 'app-formulario-proveedor',
@@ -16,9 +10,17 @@ export interface DatosProveedor {
   styleUrl: './formulario-proveedor.css',
 })
 export class FormularioProveedor {
-  // Recibe datos del componente padre o le comunica acciones.
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<DatosProveedor>();
+
+  editando = false;
+
+  // Carga los datos cuando se abre para editar.
+  @Input() set proveedorEditar(proveedor: DatosProveedor | null) {
+    if (!proveedor) return;
+    this.datos = { ...proveedor };
+    this.editando = true;
+  }
 
   datos: DatosProveedor = {
     nombre: '',
@@ -27,8 +29,7 @@ export class FormularioProveedor {
     notas: '',
   };
 
-  // Envía los datos al componente que abrió el formulario.
   onGuardar(): void {
-    this.guardar.emit(this.datos);
+    this.guardar.emit({ ...this.datos, nombre: this.datos.nombre.trim() });
   }
 }

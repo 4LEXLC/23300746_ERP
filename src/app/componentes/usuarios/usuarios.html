@@ -1,0 +1,78 @@
+<!-- Cuentas de usuario del sistema. -->
+<header class="page-head">
+  <hgroup>
+    <h1>Usuarios</h1>
+    <p>{{ usuariosService.usuarios().length }} cuentas registradas</p>
+  </hgroup>
+</header>
+
+<section class="layout">
+  <section class="table-scroll" tabindex="0">
+    <table>
+      <thead>
+        <tr><th>Usuario</th><th>Rol</th><th>Estado</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (u of usuariosService.usuarios(); track u.id_usuario) {
+          <tr>
+            <td>{{ u.nombre_usuario }}</td>
+            <td>{{ u.rol === 'admin' ? 'Administrador' : 'Cajero' }}</td>
+            <td>{{ u.activo ? 'Activa' : 'Inactiva' }}</td>
+            <td>
+              <button type="button" class="act" (click)="editar(u)">Editar</button>
+              <button type="button" class="act peligro" (click)="eliminar(u)">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <form class="card" #f="ngForm" (ngSubmit)="guardar(f)">
+    <h3>{{ editando ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
+
+    <label for="u-nombre">Nombre de usuario <span class="req">*</span></label>
+    <input id="u-nombre" class="box" name="nombre_usuario" [(ngModel)]="datos.nombre_usuario" #nombre="ngModel"
+           required pattern="[A-Za-z0-9._]{4,30}" autocomplete="off" />
+    @if (nombre.invalid && (nombre.touched || f.submitted)) {
+      <small class="error">De 4 a 30 caracteres: letras, números, punto o guion bajo, sin espacios.</small>
+    }
+
+    <label for="u-pass">Contraseña @if (!editando) { <span class="req">*</span> }</label>
+    <input id="u-pass" class="box" type="password" name="contrasena" [(ngModel)]="datos.contrasena" #pass="ngModel"
+           [required]="!editando" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}" autocomplete="new-password" />
+    @if (editando) {
+      <small class="hint">Déjala vacía si no la quieres cambiar.</small>
+    }
+    @if (pass.invalid && (pass.touched || f.submitted)) {
+      <small class="error">Mínimo 8 caracteres, con mayúscula, minúscula, número y un carácter especial.</small>
+    }
+
+    <label for="u-rol">Rol <span class="req">*</span></label>
+    <select id="u-rol" class="box" name="rol" [(ngModel)]="datos.rol" required>
+      <option value="cajero">Cajero</option>
+      <option value="admin">Administrador</option>
+    </select>
+
+    @if (!editando) {
+      <label for="u-trab">Trabajador ligado</label>
+      <select id="u-trab" class="box" name="id_trabajador" [(ngModel)]="datos.id_trabajador">
+        <option [ngValue]="null">Ninguno</option>
+        @for (t of rhService.trabajadores(); track t.id_trabajador) {
+          <option [ngValue]="t.id_trabajador">{{ t.nombre }}</option>
+        }
+      </select>
+    }
+
+    <label class="check">
+      <input type="checkbox" name="activo" [(ngModel)]="datos.activo" /> Cuenta activa
+    </label>
+
+    <footer class="botones">
+      @if (editando) {
+        <button type="button" class="btn btn-sec" (click)="limpiar(f)">Cancelar</button>
+      }
+      <button type="submit" class="btn btn-pri">{{ editando ? 'Guardar cambios' : 'Crear usuario' }}</button>
+    </footer>
+  </form>
+</section>

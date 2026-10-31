@@ -1,10 +1,13 @@
 const express = require('express');
+const { requiereRol } = require('../middleware/auth.middleware');
+const { calcularTotal } = require('../app/services/paypal.service');
 const {
   obtenerVentas,
   obtenerVentaPorId,
   crearVenta,
   actualizarVenta,
   eliminarVenta,
+  trabajadorDelUsuario,
 } = require('../app/services/venta.service');
 
 const router = express.Router();
@@ -14,7 +17,7 @@ const router = express.Router();
 // POST /api/venta      -> crea una venta nueva (la usa el punto de venta al cobrar)
 // PUT  /api/venta/:id  -> edita una venta
 // DELETE /api/venta/:id -> elimina una venta
-router.get('/', async (req, res) => {
+router.get('/', requiereRol('admin'), async (req, res) => {
   try {
     res.json(await obtenerVentas());
   } catch (error) {
@@ -23,7 +26,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requiereRol('admin'), async (req, res) => {
   try {
     const registro = await obtenerVentaPorId(req.params.id);
     if (!registro) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -36,7 +39,33 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const nuevoRegistro = await crearVenta(req.body);
+    const { productos, subtotal, iva, total } = req.body;
+
+    // Al menos un producto.
+    if (!Array.isArray(productos) || !productos.length) {
+      return res.status(400).json({ mensaje: 'La venta debe tener al menos un producto.' });
+    }
+    // Ningún importe negativo.
+    if ([subtotal, iva, total].some((valor) => !(Number(valor) >= 0))) {
+      return res.status(400).json({ mensaje: 'Los importes no pueden ser negativos.' });
+    }
+    // El total se recalcula con los precios de la base, no con los del navegador.
+    let totalReal;
+    try {
+      totalReal = await calcularTotal(productos.map((p) => ({ id: p.id_producto, cantidad: p.cantidad })));
+    } catch (error) {
+      return res.status(400).json({ mensaje: error.message });
+    }
+    if (Math.abs(totalReal - Number(total)) > 0.01) {
+      return res.status(400).json({ mensaje: 'El total no coincide con los productos.' });
+    }
+    // El cajero sale del token.
+    const idTrabajador = await trabajadorDelUsuario(req.usuario.id_usuario);
+    if (!idTrabajador) {
+      return res.status(400).json({ mensaje: 'Tu usuario no está ligado a ningún trabajador.' });
+    }
+
+    const nuevoRegistro = await crearVenta({ ...req.body, id_trabajador: idTrabajador });
     res.status(201).json(nuevoRegistro);
   } catch (error) {
     console.error('Error al crear el registro:', error);
@@ -44,7 +73,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requiereRol('admin'), async (req, res) => {
   try {
     const registroActualizado = await actualizarVenta(req.params.id, req.body);
     if (!registroActualizado) return res.status(404).json({ mensaje: 'Registro no encontrado.' });
@@ -55,7 +84,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requiereRol('admin'), async (req, res) => {
   try {
     await eliminarVenta(req.params.id);
     res.status(204).send();

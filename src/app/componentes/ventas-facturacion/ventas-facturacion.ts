@@ -1,20 +1,27 @@
-// Historial de ventas y gestión de facturas.
+// Historial de ventas, facturas y clientes.
 import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DatosCliente, FormularioCliente } from '../compartidos/modales/formulario-cliente/formulario-cliente';
-import { Venta, VentasService } from '../compartidos/servicios/ventas.service';
+import { FormularioCliente } from '../compartidos/modales/formulario-cliente/formulario-cliente';
+import { Cliente, DatosCliente, PagoBackend, Venta, VentasService } from '../compartidos/servicios/ventas.service';
+import { AvisoService } from '../compartidos/servicios/aviso.service';
+import { DetalleVenta } from './modales/detalle-venta/detalle-venta';
 
 @Component({
-  imports: [DatePipe, FormsModule, FormularioCliente],
+  imports: [DatePipe, FormsModule, FormularioCliente, DetalleVenta],
   selector: 'app-ventas-facturacion',
   styleUrl: './ventas-facturacion.css',
   templateUrl: './ventas-facturacion.html',
 })
 export class VentasFacturacion {
-  constructor(public ventasService: VentasService) {}
+  constructor(
+    public ventasService: VentasService,
+    private aviso: AvisoService,
+  ) {
+    this.ventasService.cargar();
+  }
 
-  pestanaActiva: 'ventas' | 'facturas' = 'ventas';
+  pestanaActiva: 'ventas' | 'facturas' | 'pagos' | 'clientes' = 'ventas';
   diasPeriodo = 7;
   periodos = [
     { dias: 1, etiqueta: 'Hoy' },
@@ -24,7 +31,6 @@ export class VentasFacturacion {
   ];
   hoy = new Date();
 
-  // Obtiene el historial de ventas.
   get ventas(): Venta[] {
     return this.ventasService.ventas();
   }
@@ -38,52 +44,103 @@ export class VentasFacturacion {
     return this.ventas.filter((v) => v.fecha >= limite);
   }
 
-  // Muestra las ventas según la pestaña activa y el periodo.
+  // En la pestaña Facturas salen las vigentes y las canceladas.
   get ventasMostradas(): Venta[] {
-    return this.pestanaActiva === 'facturas' ? this.ventasPeriodo.filter((v) => v.factura === 'emitida') : this.ventasPeriodo;
+    return this.pestanaActiva === 'facturas'
+      ? this.ventasPeriodo.filter((v) => v.factura !== 'sin-facturar')
+      : this.ventasPeriodo;
   }
 
-  // Obtiene la cantidad de ventas del periodo.
+  // Lista de pagos del periodo, del más reciente al más antiguo.
+  get pagosPeriodo(): PagoBackend[] {
+    return this.ventasPeriodo
+      .map((v) => v.pago)
+      .filter((p): p is PagoBackend => !!p)
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  }
+
+  folioDeVenta(idVenta: number): string {
+    return `V-${idVenta}`;
+  }
+
   get totalVentas(): number {
     return this.ventasPeriodo.length;
   }
 
-  // Cuenta las ventas con factura emitida del periodo.
   get totalFacturadas(): number {
     return this.ventasPeriodo.filter((v) => v.factura === 'emitida').length;
   }
 
   mostrarFormularioCliente = false;
   ventaEnFactura: Venta | null = null;
+  ventaDetalle: Venta | null = null;
   ultimaFactura = '';
   subtotalFacturado = 0;
   ivaFacturado = 0;
   totalFacturado = 0;
 
-  // Abre el formulario para facturar la venta elegida.
   facturar(venta: Venta): void {
     this.ventaEnFactura = venta;
     this.mostrarFormularioCliente = true;
   }
 
-  // Genera el folio y actualiza los datos de la factura.
   generarFactura(datos: DatosCliente): void {
     const venta = this.ventaEnFactura;
     if (!venta) return;
-
-    this.ventasService.generarFactura(venta, datos).subscribe((facturada) => {
-      this.ultimaFactura = facturada.folioFactura ?? '';
-      this.totalFacturado = venta.total;
-      this.ivaFacturado = venta.total - venta.total / 1.16;
-      this.subtotalFacturado = venta.total - this.ivaFacturado;
+    this.ventasService.generarFactura(venta, datos).subscribe({
+      next: (facturada) => {
+        this.ultimaFactura = facturada.folioFactura ?? '';
+        this.subtotalFacturado = venta.subtotal;
+        this.ivaFacturado = venta.iva;
+        this.totalFacturado = venta.total;
+        this.aviso.exito(`Factura ${this.ultimaFactura} generada y enviada por correo.`);
+      },
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo generar la factura.'),
     });
-
     this.ventaEnFactura = null;
     this.mostrarFormularioCliente = false;
   }
 
-  // Retira la factura de la venta.
+  // Cancela sin borrar.
   cancelarFactura(venta: Venta): void {
-    this.ventasService.cancelarFactura(venta);
+    this.ventasService.cancelarFactura(venta).subscribe({
+      next: () => this.aviso.exito(`Factura ${venta.folioFactura} cancelada.`),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo cancelar la factura.'),
+    });
+  }
+
+  // ---- clientes ----
+  clienteEnEdicion: Cliente | null = null;
+  datosClienteEdicion: DatosCliente | null = null;
+
+  verClientes(): void {
+    this.pestanaActiva = 'clientes';
+    this.ventasService.cargarClientes();
+  }
+
+  editarCliente(cliente: Cliente): void {
+    this.clienteEnEdicion = cliente;
+    this.datosClienteEdicion = {
+      nombre: cliente.nombre,
+      rfc: cliente.rfc,
+      codigoPostal: cliente.codigo_postal,
+      regimenFiscal: cliente.regimen_fiscal,
+      correo: cliente.correo ?? '',
+    };
+  }
+
+  cerrarEdicionCliente(): void {
+    this.clienteEnEdicion = null;
+    this.datosClienteEdicion = null;
+  }
+
+  guardarCliente(datos: DatosCliente): void {
+    const cliente = this.clienteEnEdicion;
+    if (!cliente) return;
+    this.ventasService.actualizarCliente(cliente.id_cliente, datos).subscribe({
+      next: () => this.aviso.exito('Cliente actualizado.'),
+      error: (e) => this.aviso.error(e.error?.mensaje ?? 'No se pudo actualizar el cliente.'),
+    });
+    this.cerrarEdicionCliente();
   }
 }

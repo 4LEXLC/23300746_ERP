@@ -1,6 +1,6 @@
 // Pedido compartido, reserva de existencia y registro del pago.
 import { Injectable } from '@angular/core';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, map, of, switchMap, tap } from 'rxjs';
 import { Producto } from '../../punto-venta/componentes/producto-card/producto-card';
 import { ItemCarrito } from '../../punto-venta/componentes/carrito-item/carrito-item';
 import { InventarioService } from './inventario.service';
@@ -108,9 +108,15 @@ export class CarritoService {
     if (!this.ventaConfirmada) return of(false);
 
     const metodoEtiqueta = this.metodoPago === 'efectivo' ? 'Efectivo' : 'Tarjeta';
-    const items = this.items.map((i) => ({ nombre: i.producto.nombre, cantidad: i.cantidad, precioUnitario: i.producto.precio }));
+    const items = this.items.map((i) => ({
+      id_producto: i.producto.id_producto,
+      nombre: i.producto.nombre,
+      cantidad: i.cantidad,
+      precioUnitario: i.producto.precio,
+    }));
 
     return this.ventasService.registrarVenta(items, this.subtotal, this.iva, this.total, metodoEtiqueta, referencia).pipe(
+      switchMap((venta) => this.ventasService.crearTicket(venta.id_venta, venta.folio).pipe(map(() => venta))),
       tap((venta) => {
         this.contabilidadService.registrarIngreso(`Venta ${venta.folio}`, this.total, venta.id_venta);
         this.ultimoFolio = venta.folio;

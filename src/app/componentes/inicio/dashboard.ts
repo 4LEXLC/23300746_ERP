@@ -3,6 +3,11 @@ import { Component, LOCALE_ID } from '@angular/core';
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeEsMx from '@angular/common/locales/es-MX';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../compartidos/servicios/auth.service';
+import { VentasService } from '../compartidos/servicios/ventas.service';
+import { ContabilidadService } from '../compartidos/servicios/contabilidad.service';
+import { InventarioService } from '../compartidos/servicios/inventario.service';
+import { RhService } from '../compartidos/servicios/rh.service';
 
 registerLocaleData(localeEsMx);
 
@@ -29,14 +34,67 @@ interface Modulo {
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
+  constructor(
+    private ventasService: VentasService,
+    private contabilidadService: ContabilidadService,
+    private inventarioService: InventarioService,
+    private rhService: RhService,
+    public authService: AuthService,
+  ) {
+    this.ventasService.cargar();
+    this.contabilidadService.cargar();
+    this.rhService.cargar();
+  }
+
   hoy = new Date();
 
-  estadisticas: Estadistica[] = [
-    { etiqueta: 'Ventas de hoy', valor: '$0.00', tendencia: '0%' },
-    { etiqueta: 'Ingresos del mes', valor: '$0.00', tendencia: '0%' },
-    { etiqueta: 'Productos con alerta de existencia', valor: '0', alerta: true },
-    { etiqueta: 'Trabajadores activos', valor: '0' },
-  ];
+  // Variación porcentual contra el periodo anterior; sin dato anterior no se muestra.
+  private tendencia(actual: number, anterior: number): string | undefined {
+    if (!anterior) return undefined;
+    const cambio = ((actual - anterior) / anterior) * 100;
+    return `${cambio >= 0 ? '+' : ''}${cambio.toFixed(0)}%`;
+  }
+
+  private dinero(valor: number): string {
+    return `$${valor.toFixed(2)}`;
+  }
+
+  // Los indicadores se calculan con los datos reales cada vez que cambian.
+  get estadisticas(): Estadistica[] {
+    const inicioHoy = new Date();
+    inicioHoy.setHours(0, 0, 0, 0);
+    const inicioAyer = new Date(inicioHoy);
+    inicioAyer.setDate(inicioAyer.getDate() - 1);
+
+    const ventas = this.ventasService.ventas();
+    const ventasHoy = ventas.filter((v) => v.fecha >= inicioHoy).reduce((s, v) => s + v.total, 0);
+    const ventasAyer = ventas.filter((v) => v.fecha >= inicioAyer && v.fecha < inicioHoy).reduce((s, v) => s + v.total, 0);
+
+    const ahora = new Date();
+    const ingresosDelMes = (mes: number, anio: number) =>
+      this.contabilidadService
+        .movimientos()
+        .filter((m) => {
+          const f = new Date(`${m.fecha}T00:00:00`);
+          return m.tipo === 'ingreso' && f.getMonth() === mes && f.getFullYear() === anio;
+        })
+        .reduce((s, m) => s + m.monto, 0);
+    const mesAnterior = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+    const ingresosMes = ingresosDelMes(ahora.getMonth(), ahora.getFullYear());
+    const ingresosMesAnterior = ingresosDelMes(mesAnterior.getMonth(), mesAnterior.getFullYear());
+
+    const productosEnAlerta = this.inventarioService
+      .productos()
+      .filter((p) => p.estado === 'activo' && this.inventarioService.estado(p) !== 'disponible').length;
+    const trabajadoresActivos = this.rhService.trabajadores().filter((t) => t.estado === 'activo').length;
+
+    return [
+      { etiqueta: 'Ventas de hoy', valor: this.dinero(ventasHoy), tendencia: this.tendencia(ventasHoy, ventasAyer) },
+      { etiqueta: 'Ingresos del mes', valor: this.dinero(ingresosMes), tendencia: this.tendencia(ingresosMes, ingresosMesAnterior) },
+      { etiqueta: 'Productos con alerta de existencia', valor: String(productosEnAlerta), alerta: true },
+      { etiqueta: 'Trabajadores activos', valor: String(trabajadoresActivos) },
+    ];
+  }
 
   modulos: Modulo[] = [
     {

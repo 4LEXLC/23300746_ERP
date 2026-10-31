@@ -2,7 +2,7 @@
       <header class="page-head">
         <hgroup>
           <h1>Compras y Proveedores</h1>
-          <p>{{ proveedores().length }} proveedores activos · {{ ordenes().length }} órdenes pendientes de recepción</p>
+          <p>{{ nombresProveedores.length }} proveedores activos · {{ ordenesPendientes }} órdenes pendientes de recepción</p>
         </hgroup>
         <button type="button" class="add-btn" (click)="mostrarFormularioOrden = true">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
@@ -18,23 +18,36 @@
         />
       }
       @if (mostrarFormularioProveedor) {
-        <app-formulario-proveedor (cerrar)="mostrarFormularioProveedor = false" (guardar)="agregarProveedor($event)" />
+        <app-formulario-proveedor
+          [proveedorEditar]="datosProveedorEdicion"
+          (cerrar)="mostrarFormularioProveedor = false"
+          (guardar)="guardarProveedor($event)"
+        />
       }
 
       <section class="card">
         <header class="card-head">
           <h3>Proveedores</h3>
-          <button type="button" class="mini-add" (click)="mostrarFormularioProveedor = true">
+          <button type="button" class="mini-add" (click)="abrirNuevoProveedor()">
             <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
             Agregar
           </button>
         </header>
         <ul class="prov-list">
-          @for (proveedor of proveedores(); track proveedor.nombre) {
-            <li class="prov">
+          @for (proveedor of proveedores(); track proveedor.id_proveedor) {
+            <li class="prov" [class.inactivo]="proveedor.estado === 'inactivo'">
               <span class="prov-ic"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="14" height="11"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></span></span>
-              <p class="prov-name">{{ proveedor.nombre }}</p>
-              <p class="prov-meta">{{ proveedor.telefono }}<br />{{ proveedor.correo }}</p>
+              <p class="prov-name">
+                {{ proveedor.nombre }}
+                @if (proveedor.estado === 'inactivo') { <small>(inactivo)</small> }
+              </p>
+              <p class="prov-meta">{{ proveedor.telefono || '—' }}<br />{{ proveedor.correo || '—' }}</p>
+              <span class="prov-acciones">
+                <button type="button" class="link-btn" (click)="editarProveedor(proveedor)">Editar</button>
+                <button type="button" class="link-btn" (click)="cambiarEstadoProveedor(proveedor)">
+                  {{ proveedor.estado === 'activo' ? 'Desactivar' : 'Activar' }}
+                </button>
+              </span>
             </li>
           }
         </ul>
@@ -61,7 +74,10 @@
                 <td><b>{{ orden.folio }}</b></td>
                 <td>{{ orden.fecha | date: 'dd/MM/yyyy' }}</td>
                 <td>{{ orden.proveedor }}</td>
-                <td class="muted">{{ orden.items.length }} producto{{ orden.items.length === 1 ? '' : 's' }}</td>
+                <td class="muted">
+                  {{ orden.items.length }} producto{{ orden.items.length === 1 ? '' : 's' }}
+                  <button type="button" class="link-btn" (click)="ordenDetalle = orden">Ver detalle</button>
+                </td>
                 <td class="price">${{ orden.total.toFixed(2) }}</td>
                 <td>
                   <span class="badge" [class]="orden.estado">
@@ -79,3 +95,7 @@
           </tbody>
         </table>
       </section>
+
+      @if (ordenDetalle) {
+        <app-detalle-orden [orden]="ordenDetalle" (cerrar)="ordenDetalle = null" />
+      }

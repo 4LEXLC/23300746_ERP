@@ -240,3 +240,17 @@ select.box {
   width: 14px;
   height: 14px;
 }
+
+/* Mensaje de error debajo de un campo. */
+.error {
+  display: block;
+  margin-top: 4px;
+  color: #b42318;
+  font-size: 0.8rem;
+}
+
+/* Campo en rojo cuando ya lo tocaron o ya intentaron guardar. */
+.box.ng-invalid.ng-touched,
+.ng-submitted .box.ng-invalid {
+  border-color: #b42318;
+}

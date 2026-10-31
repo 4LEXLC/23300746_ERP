@@ -65,7 +65,9 @@ async function paypalRequest(ruta, metodo, body) {
   const datos = await respuesta.json();
   if (!respuesta.ok) {
     console.error('Error de PayPal:', datos);
-    throw new Error('Operación de PayPal rechazada');
+    const error = new Error('Operación de PayPal rechazada');
+    error.status = respuesta.status;
+    throw error;
   }
   return datos;
 }
@@ -137,9 +139,25 @@ async function capturarOrden(orderId) {
   };
 }
 
+// Pregunta a PayPal por la captura y confirma que esté completada y por el monto esperado.
+async function verificarCaptura(captureId, montoEsperado) {
+  let captura;
+  try {
+    captura = await paypalRequest(`/v2/payments/captures/${encodeURIComponent(captureId)}`, 'GET');
+  } catch (error) {
+    // 404: PayPal sí contestó, pero esa captura no existe. Es un rechazo, no una falla de red.
+    if (error.status === 404) return false;
+    throw error;
+  }
+  const monto = Number(captura.amount?.value);
+  return captura.status === 'COMPLETED' && Math.abs(monto - Number(montoEsperado)) <= 0.01;
+}
+
 module.exports = {
   obtenerClientToken,
   paypalRequest,
   crearOrden,
   capturarOrden,
+  calcularTotal,
+  verificarCaptura,
 };

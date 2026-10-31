@@ -1,11 +1,12 @@
 // Menú de navegación entre módulos.
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../servicios/auth.service';
 
 interface ItemMenu {
   ruta: string;
   etiqueta: string;
-  icono: 'inicio' | 'ventas' | 'inventario' | 'facturacion' | 'compras' | 'contabilidad' | 'rh';
+  icono: 'inicio' | 'ventas' | 'inventario' | 'facturacion' | 'compras' | 'contabilidad' | 'rh' | 'usuarios';
 }
 
 @Component({
@@ -15,6 +16,16 @@ interface ItemMenu {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  // Cierra la sesión y vuelve al login.
+  cerrarSesion(evento: Event): void {
+    evento.preventDefault();
+    this.authService.cerrarSesion();
+    this.router.navigateByUrl('/login');
+  }
+
+
   items: ItemMenu[] = [
     { ruta: '/dashboard', etiqueta: 'Inicio', icono: 'inicio' },
     { ruta: '/punto-venta', etiqueta: 'Punto de Venta', icono: 'ventas' },
@@ -23,5 +34,6 @@ export class Sidebar {
     { ruta: '/compras-proveedores', etiqueta: 'Compras y Proveedores', icono: 'compras' },
     { ruta: '/contabilidad', etiqueta: 'Contabilidad y Finanzas', icono: 'contabilidad' },
     { ruta: '/recursos-humanos', etiqueta: 'Recursos Humanos', icono: 'rh' },
+    { ruta: '/usuarios', etiqueta: 'Usuarios', icono: 'usuarios' },
   ];
 }

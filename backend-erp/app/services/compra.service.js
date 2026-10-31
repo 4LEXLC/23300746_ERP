@@ -21,11 +21,34 @@ async function obtenerCompraPorId(id) {
   return filas.length ? mapFila(filas[0]) : null;
 }
 
+// Guarda qué proveedor surte cada producto y a qué precio.
+async function guardarPreciosProveedor(idProveedor, productos) {
+  for (const p of productos) {
+    if (!p.id_producto) continue;
+    const [existe] = await conexion.promise().query(
+      'SELECT id_producto_proveedor FROM producto_proveedor WHERE id_producto = ? AND id_proveedor = ?',
+      [p.id_producto, idProveedor]
+    );
+    if (existe.length) {
+      await conexion.promise().query(
+        'UPDATE producto_proveedor SET precio_compra = ? WHERE id_producto_proveedor = ?',
+        [p.precioUnitario, existe[0].id_producto_proveedor]
+      );
+    } else {
+      await conexion.promise().query(
+        'INSERT INTO producto_proveedor (id_producto, id_proveedor, precio_compra) VALUES (?, ?, ?)',
+        [p.id_producto, idProveedor, p.precioUnitario]
+      );
+    }
+  }
+}
+
 async function crearCompra(datos) {
   const [resultado] = await conexion.promise().query(
     'INSERT INTO compra (id_proveedor, productos, total, estado) VALUES (?, ?, ?, ?)',
     [datos.id_proveedor, JSON.stringify(datos.productos ?? []), datos.total, datos.estado ?? 'pendiente']
   );
+  await guardarPreciosProveedor(datos.id_proveedor, datos.productos ?? []);
   return obtenerCompraPorId(resultado.insertId);
 }
 

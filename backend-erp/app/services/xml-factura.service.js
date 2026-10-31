@@ -15,9 +15,12 @@ const REGIMENES = {
   'Régimen de Incorporación Fiscal': '621',
 };
 
+// G03 solo vale para estos regímenes; para los demás (como 605 o 616) se usa S01.
+const REGIMENES_G03 = ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'];
+
 const FORMAS_PAGO = {
   Efectivo: '01',
-  Tarjeta: '04',
+  Tarjeta: '31', // La tarjeta siempre pasa por PayPal (intermediario de pagos).
   PayPal: '31',
 };
 
@@ -98,12 +101,17 @@ async function generarXmlFactura(id_factura) {
   const rfcReceptor = datos.rfc || 'XAXX010101000';
   const regimenReceptor = REGIMENES[datos.regimen_fiscal] || '616';
   const formaPago = FORMAS_PAGO[datos.metodo_pago] || '99';
+  const usoCfdi = REGIMENES_G03.includes(regimenReceptor) ? 'G03' : 'S01';
+  // La serie es el prefijo del folio y el folio es solo el número (FAC-0003 -> A: FAC, 0003).
+  const [serie, numeroFolio] = String(datos.folio).split('-');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
     <cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfd40.xsd"
         Version="4.0"
-        Serie="A"
-        Folio="${escaparXml(datos.folio)}"
+        Serie="${escaparXml(serie)}"
+        Folio="${escaparXml(numeroFolio ?? datos.folio)}"
         Fecha="${fechaSat(datos.fecha_emision)}"
         FormaPago="${formaPago}"
         MetodoPago="PUE"
@@ -122,7 +130,7 @@ async function generarXmlFactura(id_factura) {
         Nombre="${escaparXml(datos.nombre)}"
         DomicilioFiscalReceptor="${escaparXml(datos.codigo_postal || EMISOR.codigoPostal)}"
         RegimenFiscalReceptor="${regimenReceptor}"
-        UsoCFDI="G03"/>
+        UsoCFDI="${usoCfdi}"/>
     <cfdi:Conceptos>${conceptos}
     </cfdi:Conceptos>
     <cfdi:Impuestos TotalImpuestosTrasladados="${dinero(totalIva)}">

@@ -1,0 +1,37 @@
+<!-- Detalle de la orden de compra. -->
+<aside class="overlay" (click)="cerrar.emit()">
+  <article class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-head">
+      <hgroup>
+        <h3>Orden {{ orden.folio }}</h3>
+        <p>{{ orden.fecha | date: 'dd/MM/yyyy' }} · {{ orden.proveedor }}</p>
+      </hgroup>
+      <button type="button" class="modal-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <p class="section-lbl">Productos</p>
+      <table class="detalle">
+        <thead>
+          <tr><th>Producto</th><th>Cant.</th><th>Precio de compra</th><th>Importe</th></tr>
+        </thead>
+        <tbody>
+          @for (item of orden.items; track $index) {
+            <tr>
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>${{ item.precioUnitario.toFixed(2) }}</td>
+              <td>${{ (item.cantidad * item.precioUnitario).toFixed(2) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <dl class="datos">
+        <dt>Estado</dt><dd>{{ orden.estado === 'recibida' ? 'Recibida' : 'Pendiente' }}</dd>
+        <dt>Total</dt><dd><b>${{ orden.total.toFixed(2) }}</b></dd>
+      </dl>
+    </section>
+  </article>
+</aside>

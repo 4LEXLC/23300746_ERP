@@ -452,3 +452,7 @@ input::placeholder {
     flex-direction: column;
   }
 }
+
+.req {
+  color: var(--accent-2, #c0392b);
+}

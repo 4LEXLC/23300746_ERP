@@ -90,6 +90,11 @@ export const routes: Routes = [
         loadComponent: () => import('./componentes/recursos-humanos/rh').then((m) => m.RH),
         title: 'Recursos Humanos — Cafetería ERP',
       },
+      {
+        path: 'usuarios',
+        loadComponent: () => import('./componentes/usuarios/usuarios').then((m) => m.Usuarios),
+        title: 'Usuarios — Cafetería ERP',
+      },
     ],
   },
   { path: '', pathMatch: 'full', redirectTo: 'login' },

@@ -7,6 +7,7 @@ export interface Producto {
   categoria: string;
   precio: number;
   icono: 'bebida' | 'reposteria';
+  imagen?: string;
 }
 
 @Component({
