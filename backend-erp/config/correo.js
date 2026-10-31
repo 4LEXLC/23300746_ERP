@@ -13,7 +13,7 @@ const trasportador = nodemailer.createTransport({
 //Envia correo
 async function enviarCorreo({ para, asunto, html,adjuntos= [] }){
     return trasportador.sendMail({
-        from:'"Cafeteria ERP" <${process.env.CORREO_USUARIO}>',
+        from: `"Cafeteria ERP" <${process.env.CORREO_USUARIO}>`,        
         to: para,
         subject: asunto,
         html,
